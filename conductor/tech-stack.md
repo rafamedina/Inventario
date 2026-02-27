@@ -2,7 +2,7 @@
 
 ## Core Technologies
 - **Programming Language**: Python 3.12 (as detected in the current environment)
-- **Framework**: Odoo (Version 15.0+ or compatible)
+- **Framework**: Odoo (Version 17.0)
 - **Database Backend**: PostgreSQL (Standard Odoo backend)
 
 ## Odoo Dependencies
