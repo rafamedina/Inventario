@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_inventory_asset,inventory.asset.access,model_inventory_asset,base.group_user,1,1,1,1
+access_plans_asset,plans.asset.access,model_plans_asset,base.group_user,1,1,1,1
+access_plans_task,plans.task.access,model_plans_task,base.group_user,1,1,1,1
+access_plans_alert,plans.alert.access,model_plans_alert,base.group_user,1,1,1,1
+access_inventory_category,inventory.category.access,model_inventory_category,base.group_user,1,1,1,1
+access_inventory_subcategory,inventory.subcategory.access,model_inventory_subcategory,base.group_user,1,1,1,1
+access_inventory_location,inventory.location.access,model_inventory_location,base.group_user,1,1,1,1

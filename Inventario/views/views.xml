@@ -1,0 +1,286 @@
+<odoo>
+  <data>
+
+    <record id="view_inventory_category_tree" model="ir.ui.view">
+        <field name="name">inventory.category.tree</field>
+        <field name="model">inventory.category</field>
+        <field name="arch" type="xml">
+            <tree string="Categorías">
+                <field name="codigo"/>
+                <field name="nombre"/>
+                <field name="descripcion"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_inventory_category_form" model="ir.ui.view">
+        <field name="name">inventory.category.form</field>
+        <field name="model">inventory.category</field>
+        <field name="arch" type="xml">
+            <form string="Categoría">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" invisible="active == True"/>
+                    <group>
+                        <field name="active" invisible="1"/>
+                        <field name="nombre"/>
+                        <field name="codigo"/>
+                        <field name="descripcion"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_subcategory_tree" model="ir.ui.view">
+        <field name="name">inventory.subcategory.tree</field>
+        <field name="model">inventory.subcategory</field>
+        <field name="arch" type="xml">
+            <tree string="Subcategorías">
+                <field name="codigo"/>
+                <field name="nombre"/>
+                <field name="descripcion"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_inventory_subcategory_form" model="ir.ui.view">
+        <field name="name">inventory.subcategory.form</field>
+        <field name="model">inventory.subcategory</field>
+        <field name="arch" type="xml">
+            <form string="Subcategoría">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" invisible="active == True"/>
+                    <group>
+                        <field name="active" invisible="1"/>
+                        <field name="categoria_id"/>
+                        <field name="nombre"/>
+                        <field name="codigo"/>
+                        <field name="descripcion"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_location_tree" model="ir.ui.view">
+        <field name="name">inventory.location.tree</field>
+        <field name="model">inventory.location</field>
+        <field name="arch" type="xml">
+            <tree string="Localizaciones">
+                <field name="codigo"/>
+                <field name="nombre"/>
+                <field name="descripcion"/>
+            </tree>
+        </field>
+    </record>
+    <record id="view_inventory_location_form" model="ir.ui.view">
+        <field name="name">inventory.location.form</field>
+        <field name="model">inventory.location</field>
+        <field name="arch" type="xml">
+            <form string="Localización">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado" bg_color="bg-danger" invisible="active == True"/>
+                    <group>
+                        <field name="active" invisible="1"/>
+                        <field name="nombre"/>
+                        <field name="codigo"/>
+                        <field name="descripcion"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_inventory_asset_tree" model="ir.ui.view">
+        <field name="name">inventory.asset.tree</field>
+        <field name="model">inventory.asset</field>
+        <field name="arch" type="xml">
+            <tree string="Inventario" decoration-danger="estado_mantenimiento == 'vencido'" decoration-warning="estado_mantenimiento == 'proximo'">
+                <field name="identificador_final" decoration-bf="1"/> 
+                <field name="nombre"/>
+                <field name="categoria_id"/> 
+                <field name="subcategoria_id"/> 
+                <field name="ubicacion_id"/> 
+                <field name="estado_mantenimiento" column_invisible="True"/>
+                <field name="responsable_display"/>
+                <field name="propietario_display" optional="show"/>
+                <field name="plan_id" widget="badge" decoration-info="1"/>
+                <field name="proximo_mantenimiento" widget="remaining_days"/>                
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_inventory_asset_form" model="ir.ui.view">
+        <field name="name">inventory.asset.form</field>
+        <field name="model">inventory.asset</field>
+        <field name="arch" type="xml">
+            <form string="Activo">
+                <header>
+                    <button name="action_maintenance_done" string="✅ Registrar Mantenimiento" type="object" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado (Baja)" bg_color="bg-danger" invisible="active == True"/>
+                    <div class="oe_title">
+                        <label for="nombre" class="oe_edit_only"/>
+                        <h1><field name="nombre" placeholder="Ej. Servidor Principal"/></h1>
+                        <h3><field name="identificador_final" readonly="1" class="text-info"/></h3>
+                    </div>
+                    <group>
+                        <group string="Clasificación">
+                            <field name="active" invisible="1"/>
+                            
+                            <field name="categoria_id" widget="selection"/>
+                            <field name="subcategoria_id" widget="selection"/>
+                            <field name="ubicacion_id" widget="selection"/>
+                            <field name="anio_inclusion"/>
+                            
+                            <field name="tipo"/>
+                            <field name="localizacion"/>
+                        </group>
+                        <group string="Responsable y Propietario">
+                            <field name="tipo_responsable" widget="radio" options="{'horizontal': true}"/>
+                            <field name="responsable_empleado_id" invisible="tipo_responsable != 'empleado'"/>
+                            <field name="responsable_departamento_id" invisible="tipo_responsable != 'departamento'"/>
+                            <hr colspan="2"/>
+                            <field name="tipo_propietario" widget="radio" options="{'horizontal': true}"/>
+                            <field name="propietario_empleado_id" invisible="tipo_propietario != 'empleado'"/>
+                            <field name="propietario_departamento_id" invisible="tipo_propietario != 'departamento'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Detalles Técnicos y Mantenimiento">
+                            <group>
+                                <group string="Hardware y Software">
+                                    <field name="hardware"/>
+                                    <field name="os"/>
+                                    <field name="version"/>
+                                </group>
+                                <group string="Mantenimiento">
+                                    <field name="plan_id"/> 
+                                    <field name="ultimomantenimiento"/> 
+                                    <field name="proximo_mantenimiento"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Descripción y Detalles">
+                             <field name="descripcion"/>
+                             <separator string="Detalles Adicionales"/>
+                             <field name="detalles_adicionales"/>
+                             <separator string="Observaciones"/>
+                             <field name="notas"/>
+                        </page>
+                        <page string="Código UUID Interno">
+                            <group>
+                                <field name="uuid_activo"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_plans_asset_form" model="ir.ui.view">
+        <field name="name">plans.asset.form</field>
+        <field name="model">plans.asset</field>
+        <field name="arch" type="xml">
+            <form string="Plan de Mantenimiento">
+                <sheet>
+                    <widget name="web_ribbon" title="Archivado (Baja)" bg_color="bg-danger" invisible="active == True"/>
+                    <div class="oe_title">
+                        <h1><field name="identificador"/></h1>
+                        <h2><field name="nombre" placeholder="Ej. Revisión Servidores"/></h2>
+                    </div>
+                    <group>
+                        <group string="Configuración Principal">
+                            <field name="active" invisible="1"/>
+                            <field name="categoria_id" widget="selection"/>
+                            <field name="subcategoria_id" widget="selection"/>
+                            <field name="periodicidad"/>
+                        </group>
+                        <group string="Alertas de Atraso">
+                            <field name="alerta_recurrente"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lista de Tareas (Checklist)">
+                            <field name="tarea_ids">
+                                <tree editable="bottom">
+                                    <field name="name" string="Descripción de la tarea"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Alertas Previas (Notificaciones)">
+                            <field name="alerta_ids">
+                                <tree editable="bottom">
+                                    <field name="valor" string="Avisar"/>
+                                    <field name="unidad" string="Unidad de tiempo"/>
+                                    <field name="name" column_invisible="True"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <record id="view_plans_asset_tree" model="ir.ui.view">
+        <field name="name">plans.asset.tree</field>
+        <field name="model">plans.asset</field>
+        <field name="arch" type="xml">
+            <tree string="Planes">
+                <field name="identificador" decoration-bf="1"/>
+                <field name="nombre"/>
+                <field name="categoria_id"/>
+                <field name="subcategoria_id"/>
+                <field name="periodicidad"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_inventory_asset" model="ir.actions.act_window">
+        <field name="name">Inventario de Activos</field>
+        <field name="res_model">inventory.asset</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="action_plans_asset" model="ir.actions.act_window">
+        <field name="name">Planes de Mantenimiento</field>
+        <field name="res_model">plans.asset</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+    <record id="action_inventory_category" model="ir.actions.act_window">
+        <field name="name">Categorías</field>
+        <field name="res_model">inventory.category</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="action_inventory_subcategory" model="ir.actions.act_window">
+        <field name="name">Subcategorías</field>
+        <field name="res_model">inventory.subcategory</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <record id="action_inventory_location" model="ir.actions.act_window">
+        <field name="name">Localizaciones</field>
+        <field name="res_model">inventory.location</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_inventory_root" name="Gestión de Activos" sequence="10"/>
+    
+    <menuitem id="menu_operations" name="Operaciones" parent="menu_inventory_root" sequence="1"/>
+    <menuitem id="menu_asset_list" name="Inventario" parent="menu_operations" action="action_inventory_asset" sequence="1"/>
+    
+    <menuitem id="menu_maintenance_root" name="Mantenimiento" parent="menu_inventory_root" sequence="2"/>
+    <menuitem id="menu_plans_list" name="Planes" parent="menu_maintenance_root" action="action_plans_asset" sequence="1"/>
+
+    <menuitem id="menu_configuration_root" name="Configuración" parent="menu_inventory_root" sequence="100"/>
+    <menuitem id="menu_config_categories" name="Categorías" parent="menu_configuration_root" action="action_inventory_category" sequence="1"/>
+    <menuitem id="menu_config_subcategories" name="Subcategorías" parent="menu_configuration_root" action="action_inventory_subcategory" sequence="2"/>
+    <menuitem id="menu_config_locations" name="Localizaciones" parent="menu_configuration_root" action="action_inventory_location" sequence="3"/>
+
+  </data>
+</odoo>
