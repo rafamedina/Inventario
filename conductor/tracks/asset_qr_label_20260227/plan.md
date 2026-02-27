@@ -1,15 +1,15 @@
 # Implementation Plan: Asset QR and Label Printing
 
-## Phase 1: QR Code Generation Logic
+## Phase 1: QR Code Generation Logic [checkpoint: b46c524]
 - [x] Task: Write failing test for QR code field. c7f9455
     - [x] Assert that a new field `qr_code` exists on `inventory.asset` and correctly encodes a link or the ID.
 - [x] Task: Implement QR code computation in `models/models.py`. c7f9455
     - [x] Add a computed binary field or a URL-based field for the QR code.
     - [x] Use Odoo's native QR generation or a standard library.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: QR Code Generation Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: QR Code Generation Logic' (Protocol in workflow.md)
 
 ## Phase 2: Label Report & Paper Format
-- [ ] Task: Write failing test for the Label Report definition.
+- [~] Task: Write failing test for the Label Report definition.
     - [ ] Verify that a report named `action_report_asset_label` exists and is linked to the model.
 - [ ] Task: Define Paper Format for small labels.
     - [ ] Create an XML record for `report.paperformat` (e.g., 50x30mm).
