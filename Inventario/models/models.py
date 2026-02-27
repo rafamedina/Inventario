@@ -188,6 +188,23 @@ class InventoryAsset(models.Model):
             anio = record.anio_inclusion or 'XXXX'
             record.identificador_final = f"{cat}.{sub}.{ubi}.{uid}.{anio}"
 
+    # Campo QR para visualización en ficha y escaneo
+    qr_code = fields.Char(string="Código QR", compute="_compute_qr_code")
+
+    @api.depends('identificador_final')
+    def _compute_qr_code(self):
+        """ 
+        Calcula el contenido del código QR. 
+        Por ahora apunta a una URL de reporte/impresión basada en el ID del activo.
+        """
+        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        for record in self:
+            if record.id:
+                # URL que disparará la impresión (se implementará el controlador después)
+                record.qr_code = f"{base_url}/inventory/asset/print/{record.id}"
+            else:
+                record.qr_code = False
+
     estado_mantenimiento = fields.Selection([
         ('normal', 'Normal'), ('proximo', 'Próximo'), ('vencido', 'Vencido')
     ], compute='_compute_estado_mantenimiento', string="Estado")
