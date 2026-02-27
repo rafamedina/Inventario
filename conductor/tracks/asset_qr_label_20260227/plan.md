@@ -19,12 +19,12 @@
     - [x] Link the template and paper format in a new `ir.actions.report` record.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Label Report & Paper Format' (Protocol in workflow.md)
 
-## Phase 3: UI Integration
-- [~] Task: Write failing test for UI elements.
-    - [ ] Assert that the QR code field and the print button are present in the form view architecture.
-- [ ] Task: Update Asset Form View.
-    - [ ] Add the QR code widget at the top of the form.
-    - [ ] Add the "Imprimir ID" button below the QR code.
-- [ ] Task: Implement "Preview First" logic (if not default Odoo behavior).
-    - [ ] Ensure the QR code links to a URL that renders the report or a preview page.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Integration' (Protocol in workflow.md)
+## Phase 3: UI Integration [checkpoint: e6e9a0b]
+- [x] Task: Write failing test for UI elements. 68642ed
+    - [x] Assert that the QR code field and the print button are present in the form view architecture.
+- [x] Task: Update Asset Form View. e6e9a0b
+    - [x] Add the QR code widget at the top of the form.
+    - [x] Add the "Imprimir ID" button below the QR code.
+- [x] Task: Implement "Preview First" logic (if not default Odoo behavior). e6e9a0b
+    - [x] Ensure the QR code links to a URL that renders the report or a preview page.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI Integration' (Protocol in workflow.md)
