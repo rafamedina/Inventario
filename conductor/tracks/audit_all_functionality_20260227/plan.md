@@ -1,13 +1,13 @@
 # Implementation Plan: Audit all functionality
 
 ## Phase 1: Environment and Baseline Verification
-- [ ] Task: Verify current test suite status.
-    - [ ] Run `test_id_generation.py`.
-    - [ ] Run `test_import.py`.
-    - [ ] Run `test_subcategory_link.py`.
-- [ ] Task: Audit Odoo configuration files.
-    - [ ] Verify `__manifest__.py` data loading.
-    - [ ] Verify `ir.model.access.csv` permissions.
+- [x] Task: Verify current test suite status.
+    - [x] Run `test_id_generation.py`.
+    - [x] Run `test_import.py`.
+    - [x] Run `test_subcategory_link.py`.
+- [x] Task: Audit Odoo configuration files.
+    - [x] Verify `__manifest__.py` data loading.
+    - [x] Verify `ir.model.access.csv` permissions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Environment and Baseline Verification' (Protocol in workflow.md)
 
 ## Phase 2: Functional Audit and Refinement
