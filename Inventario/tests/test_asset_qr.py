@@ -20,7 +20,14 @@ class TestAssetQR(common.TransactionCase):
 
     def test_label_report_existence(self):
         """ Test that the label report is defined and linked to the model """
-        # This should fail in the Red phase
         report = self.env.ref('Inventario.action_report_asset_label', raise_if_not_found=False)
         self.assertTrue(report, "Report 'action_report_asset_label' should be defined")
         self.assertEqual(report.model, 'inventory.asset', "Report should be for 'inventory.asset' model")
+
+    def test_ui_elements_in_view(self):
+        """ Test that the QR code and print button are present in the form view """
+        # This should fail in the Red phase
+        view = self.env.ref('Inventario.view_inventory_asset_form')
+        arch = view.get_combined_arch()
+        self.assertIn('name="qr_code"', arch, "QR code field should be in the view")
+        self.assertIn('string="Imprimir ID"', arch, "Print button should be in the view")

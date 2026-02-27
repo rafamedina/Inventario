@@ -1,21 +1,18 @@
-# from odoo import http
+from odoo import http
+from odoo.http import request
 
+class InventoryController(http.Controller):
 
-# class School(http.Controller):
-#     @http.route('/school/school', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
+    @http.route('/inventory/asset/print/<int:asset_id>', auth='user', type='http', website=True)
+    def print_asset_label(self, asset_id, **kw):
+        """
+        Renders a preview page for the asset label and triggers the browser print dialog.
+        """
+        asset = request.env['inventory.asset'].browse(asset_id)
+        if not asset.exists():
+            return request.not_found()
 
-#     @http.route('/school/school/objects', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('school.listing', {
-#             'root': '/school/school',
-#             'objects': http.request.env['school.school'].search([]),
-#         })
-
-#     @http.route('/school/school/objects/<model("school.school"):obj>', auth='public')
-#     def object(self, obj, **kw):
-#         return http.request.render('school.object', {
-#             'object': obj
-#         })
-
+        # We pass the asset data to a simple template that triggers print() on load
+        return request.render('Inventario.asset_label_preview_template', {
+            'asset': asset,
+        })

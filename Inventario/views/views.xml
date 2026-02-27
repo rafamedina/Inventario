@@ -127,9 +127,16 @@
             <form string="Activo">
                 <header>
                     <button name="action_maintenance_done" string="✅ Registrar Mantenimiento" type="object" class="oe_highlight"/>
+                    <button name="%(action_report_asset_label)d" string="Imprimir ID" type="action" class="oe_highlight"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archivado (Baja)" bg_color="bg-danger" invisible="active == True"/>
+                    
+                    <!-- QR Code Widget at the top right -->
+                    <div class="oe_button_box" name="button_box">
+                        <field name="qr_code" widget="html" readonly="1" class="oe_stat_button" style="width: 100px; height: 100px; padding: 5px;"/>
+                    </div>
+
                     <div class="oe_title">
                         <label for="nombre" class="oe_edit_only"/>
                         <h1><field name="nombre" placeholder="Ej. Servidor Principal"/></h1>
@@ -271,27 +278,37 @@
     <!-- ==========================================
          HERENCIA DE EMPLEADOS (hr.employee)
          ========================================== -->
-    <!-- Vista simplificada para el Inventario -->
+    <!-- Vista de formulario para el Inventario: conserva la cabecera estándar de Odoo pero simplifica el contenido -->
     <record id="view_employee_form_inventory_simple" model="ir.ui.view">
         <field name="name">hr.employee.form.inventory.simple</field>
         <field name="model">hr.employee</field>
+        <field name="priority">999</field>
         <field name="arch" type="xml">
             <form string="Empleado (Trazabilidad)">
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <!-- Podríamos añadir aquí botones inteligentes si fuera necesario -->
+                    </div>
+                    <widget name="web_ribbon" title="Archivado" bg_color="text-bg-danger" invisible="active"/>
+                    <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
-                        <h1><field name="name" readonly="1"/></h1>
-                        <h3><field name="job_title" readonly="1"/></h3>
+                        <h1><field name="name" placeholder="Nombre del Empleado" readonly="1"/></h1>
+                        <h3><field name="job_title" placeholder="Puesto de trabajo" readonly="1"/></h3>
                     </div>
                     <group>
-                        <group string="Información de Contacto">
+                        <group>
+                            <field name="active" invisible="1"/>
                             <field name="work_email" readonly="1"/>
                             <field name="work_phone" readonly="1"/>
+                        </group>
+                        <group>
                             <field name="department_id" readonly="1"/>
+                            <field name="parent_id" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Activos Asignados (Inventario)">
+                        <page string="Activos Asignados (Inventario)" name="inventory_assets">
                             <separator string="Responsabilidades Actuales"/>
                             <field name="current_responsible_asset_ids" readonly="1">
                                 <tree>
@@ -370,18 +387,39 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-    <!-- Acción para Empleados dentro del Inventario -->
+    <!-- Acción para Empleados: Forzamos el uso de las vistas estándar para kanban/lista y la simplificada para el formulario -->
     <record id="action_inventory_employee" model="ir.actions.act_window">
         <field name="name">Empleados</field>
         <field name="res_model">hr.employee</field>
         <field name="view_mode">kanban,tree,form</field>
-        <field name="view_id" ref="view_employee_form_inventory_simple"/>
         <field name="context">{'search_default_has_responsible_assets': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Administra los empleados y su vinculación con los activos.
             </p>
         </field>
+    </record>
+
+    <!-- Definimos específicamente qué vista usar para cada modo en esta acción -->
+    <record id="action_inventory_employee_view_kanban" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="hr.hr_kanban_view_employees"/>
+        <field name="act_window_id" ref="action_inventory_employee"/>
+    </record>
+
+    <record id="action_inventory_employee_view_tree" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="hr.view_employee_tree"/>
+        <field name="act_window_id" ref="action_inventory_employee"/>
+    </record>
+
+    <record id="action_inventory_employee_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="3"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_employee_form_inventory_simple"/>
+        <field name="act_window_id" ref="action_inventory_employee"/>
     </record>
 
     <menuitem id="menu_inventory_root" name="Gestión de Activos" sequence="10"/>
