@@ -1,0 +1,8 @@
+{
+  "track_id": "asset_traceability_20260227",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-27T10:00:00Z",
+  "updated_at": "2026-02-27T10:00:00Z",
+  "description": "Quiero que cambies la trazabilidad de la informacion, cuando un portatil es asignado a un empleado esto se tiene que quedar registrado, para luego poder filtrar y sacar una lista de estos empleados, tambien tiene que ser viceversa, si busco un empleado (dentro del modulo inventario) tengo que poder filtrar por todas las cosaas que tienen asignadas ya sea como propietario o responsable"
+}
