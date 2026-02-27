@@ -126,15 +126,19 @@
         <field name="arch" type="xml">
             <form string="Activo">
                 <header>
-                    <button name="action_maintenance_done" string="✅ Registrar Mantenimiento" type="object" class="oe_highlight"/>
+                    <button name="action_maintenance_done" string="Registrar Mantenimiento" type="object" class="oe_highlight"/>
+                    <!-- Botón para imprimir la etiqueta en A4 -->
                     <button name="%(action_report_asset_label)d" string="Imprimir ID" type="action" class="oe_highlight"/>
+                    <!-- QR Code movido al header, a la derecha de los botones -->
+                    <field name="qr_code" widget="image" options='{"size": [60, 60]}' readonly="1" class="ms-3"/>
+
+                    
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archivado (Baja)" bg_color="bg-danger" invisible="active == True"/>
                     
-                    <!-- QR Code Widget at the top right -->
                     <div class="oe_button_box" name="button_box">
-                        <field name="qr_code" widget="html" readonly="1" class="oe_stat_button" style="width: 100px; height: 100px; padding: 5px;"/>
+                        <!-- Box de botones vacío o para otras estadísticas futuras -->
                     </div>
 
                     <div class="oe_title">

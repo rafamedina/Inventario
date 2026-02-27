@@ -1,6 +1,9 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from datetime import timedelta, date
+import qrcode
+import base64
+from io import BytesIO
 
 # ==========================================
 # 0. MODELOS DE CONFIGURACIÓN (Diccionarios)
@@ -188,20 +191,36 @@ class InventoryAsset(models.Model):
             anio = record.anio_inclusion or 'XXXX'
             record.identificador_final = f"{cat}.{sub}.{ubi}.{uid}.{anio}"
 
-    # Campo QR para visualización en ficha y escaneo
-    qr_code = fields.Char(string="Código QR", compute="_compute_qr_code")
+    # Campo QR: ahora de tipo Binary para almacenar la imagen real
+    qr_code = fields.Binary(string="Código QR", compute="_compute_qr_code")
 
     @api.depends('identificador_final')
     def _compute_qr_code(self):
         """ 
-        Calcula el contenido del código QR. 
-        Por ahora apunta a una URL de reporte/impresión basada en el ID del activo.
+        Genera una imagen PNG del código QR que contiene la URL de impresión.
         """
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         for record in self:
             if record.id:
-                # URL que disparará la impresión (se implementará el controlador después)
-                record.qr_code = f"{base_url}/inventory/asset/print/{record.id}"
+                # URL que disparará la impresión al escanear
+                url = f"{base_url}/inventory/asset/print/{record.id}"
+                
+                # Generación del código QR
+                qr = qrcode.QRCode(
+                    version=1,
+                    error_correction=qrcode.constants.ERROR_CORRECT_L,
+                    box_size=10,
+                    border=4,
+                )
+                qr.add_data(url)
+                qr.make(fit=True)
+
+                img = qr.make_image(fill_color="black", back_color="white")
+                
+                # Guardar la imagen en un buffer para convertirla a base64
+                stream = BytesIO()
+                img.save(stream, format="PNG")
+                record.qr_code = base64.b64encode(stream.getvalue())
             else:
                 record.qr_code = False
 

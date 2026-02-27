@@ -17,7 +17,7 @@
             <field name="dpi">96</field>
         </record>
 
-        <!-- Plantilla QWeb en A4 con texto de tamaño controlado -->
+        <!-- Plantilla QWeb en A4 con texto de tamaño controlado (Para Reporte PDF) -->
         <template id="report_asset_label_template">
             <t t-call="web.basic_layout">
                 <t t-foreach="docs" t-as="o">
@@ -32,6 +32,46 @@
                     </div>
                 </t>
             </t>
+        </template>
+
+        <!-- Plantilla de Vista Previa HTML (Para Escaneo de QR) -->
+        <template id="asset_label_preview_template" name="Vista Previa de Etiqueta">
+            <html>
+                <head>
+                    <title>Imprimir Etiqueta - <t t-esc="asset.identificador_final"/></title>
+                    <style>
+                        body { margin: 0; padding: 20px; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f0f0; }
+                        .label-container { width: 210mm; height: 297mm; background: white; padding: 20mm; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: block; position: relative; box-sizing: border-box; }
+                        .label-box { width: 50mm; height: 20mm; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; text-align: center; }
+                        .id-text { font-size: 14px; font-weight: bold; }
+                        @media print {
+                            body { background: none; padding: 0; }
+                            .label-container { box-shadow: none; padding: 10mm; width: auto; height: auto; }
+                            .no-print { display: none; }
+                        }
+                    </style>
+                    <script type="text/javascript">
+                        window.onload = function() {
+                            // Pequeño retardo para asegurar la carga visual antes del diálogo
+                            setTimeout(function() {
+                                window.print();
+                            }, 500);
+                        };
+                    </script>
+                </head>
+                <body>
+                    <div class="label-container">
+                        <div class="label-box">
+                            <div class="id-text">
+                                <t t-esc="asset.identificador_final"/>
+                            </div>
+                        </div>
+                        <p class="no-print" style="margin-top: 20px; color: #666;">
+                            Generando impresión... Si el diálogo no aparece, pulse <a href="javascript:window.print()">aquí</a>.
+                        </p>
+                    </div>
+                </body>
+            </html>
         </template>
 
         <!-- Acción de Reporte -->
