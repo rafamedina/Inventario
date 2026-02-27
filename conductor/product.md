@@ -6,6 +6,7 @@ Administra el inventario de activos de la compañia Wavext.
 - Centralized Asset Inventory: Maintain a centralized record of all company equipment.
 - Maintenance Tracking: Track the health, maintenance, and repair history of assets.
 - Traceability Management: Maintain a full historical log of asset assignments to employees.
+- Physical Asset Identification: Facilitate the identification of physical assets through QR codes and standardized labels.
 
 ## Target Users
 - IT Administrators: Responsible for technical setup and data integrity.
@@ -17,6 +18,8 @@ Administra el inventario de activos de la compañia Wavext.
 - Subcategory Relationship Mapping: Categorizing assets into logical hierarchies.
 - Bidirectional Traceability: Track assets from the employee record and employees from the asset record.
 - Historical Assignment Logs: Automatic recording of all owner and responsible changes.
+- QR Code Generation: Integrated QR codes on asset records for quick identification and mobile interaction.
+- Automated Label Printing: Support for printing standardized A4 labels containing asset IDs.
 
 ## Platform Context
 - Native Odoo Integration: Leveraging standard Odoo modules like HR and Mail.
