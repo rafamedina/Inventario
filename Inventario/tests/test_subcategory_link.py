@@ -15,12 +15,13 @@ class TestSubcategoryLink(common.TransactionCase):
     def test_subcategory_requires_category(self):
         """ Test that a subcategory cannot be created without a category """
         # After we implement the 'required=True' on the field
-        with self.assertRaises(Exception): # Odoo throws different exceptions based on DB/ORM level
-            self.Subcategory.create({
-                'nombre': 'Test Sub',
-                'codigo': 'TSUB',
-                'categoria_id': False
-            })
+        with self.assertRaises(Exception): # Odoo throws IntegrityError or ValidationError
+            with self.cr.savepoint():
+                self.Subcategory.create({
+                    'nombre': 'Test Sub',
+                    'codigo': 'TSUB',
+                    'categoria_id': False
+                })
 
     def test_dynamic_filtering_domain(self):
         """ Test that subcategories are filtered by category in Assets """
@@ -76,20 +77,21 @@ class TestSubcategoryLink(common.TransactionCase):
         # Toggle NOT NULL to allow testing the hook logic with NULL records
         self.env.cr.execute("ALTER TABLE inventory_subcategory ALTER COLUMN categoria_id DROP NOT NULL")
         
-        # Ensure no lingering NULLs from failed runs
-        self.env.cr.execute("DELETE FROM inventory_subcategory WHERE categoria_id IS NULL")
-        
-        self.env.cr.execute("INSERT INTO inventory_subcategory (nombre, codigo, active, categoria_id) VALUES ('Portátil', 'LAP', true, NULL)")
-        
-        # Call hook
-        post_init_hook(self.env)
-        
-        sub = self.Subcategory.search([('nombre', '=', 'Portátil')], limit=1)
-        self.assertTrue(sub.categoria_id, "Subcategory should be linked after hook")
-        self.assertEqual(sub.categoria_id.nombre, 'EQUIPOS')
-        
-        # Cleanup: Remove the test record before restoring NOT NULL
-        sub.unlink()
-        
-        # Restore NOT NULL
-        self.env.cr.execute("ALTER TABLE inventory_subcategory ALTER COLUMN categoria_id SET NOT NULL")
+        try:
+            # Ensure no lingering NULLs from failed runs
+            self.env.cr.execute("DELETE FROM inventory_subcategory WHERE categoria_id IS NULL")
+            
+            self.env.cr.execute("INSERT INTO inventory_subcategory (nombre, codigo, active, categoria_id) VALUES ('Portátil', 'LAP', true, NULL)")
+            
+            # Call hook
+            post_init_hook(self.env)
+            
+            sub = self.Subcategory.search([('nombre', '=', 'Portátil')], limit=1)
+            self.assertTrue(sub.categoria_id, "Subcategory should be linked after hook")
+            self.assertEqual(sub.categoria_id.nombre, 'EQUIPOS')
+            
+            # Cleanup: Remove the test record before restoring NOT NULL
+            sub.unlink()
+        finally:
+            # Restore NOT NULL always
+            self.env.cr.execute("ALTER TABLE inventory_subcategory ALTER COLUMN categoria_id SET NOT NULL")
