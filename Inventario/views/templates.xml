@@ -1,33 +1,35 @@
 <odoo>
     <data>
-        <!-- Formato de papel para etiquetas pequeñas (50x30mm) -->
+        <!-- Formato de papel A4 estándar para evitar reescalados -->
         <record id="paperformat_asset_label" model="report.paperformat">
-            <field name="name">Etiqueta de Activo (50x30mm)</field>
+            <field name="name">Etiqueta en A4 (Sin reescalado)</field>
             <field name="default" eval="True"/>
-            <field name="format">custom</field>
-            <field name="page_height">30</field>
-            <field name="page_width">50</field>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
             <field name="orientation">Portrait</field>
-            <field name="margin_top">2</field>
-            <field name="margin_bottom">2</field>
-            <field name="margin_left">2</field>
-            <field name="margin_right">2</field>
+            <field name="margin_top">10</field>
+            <field name="margin_bottom">10</field>
+            <field name="margin_left">10</field>
+            <field name="margin_right">10</field>
             <field name="header_line" eval="False"/>
             <field name="header_spacing">0</field>
             <field name="dpi">96</field>
         </record>
 
-        <!-- Plantilla QWeb para la etiqueta -->
+        <!-- Plantilla QWeb en A4 con texto de tamaño controlado -->
         <template id="report_asset_label_template">
-            <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
                 <t t-foreach="docs" t-as="o">
-                    <t t-call="web.external_layout">
-                        <div class="page">
-                            <div style="text-align: center; font-family: 'Monospace'; font-size: 14px; font-weight: bold; border: 1px solid black; padding: 5px; height: 26mm; display: flex; align-items: center; justify-content: center;">
+                    <div class="page">
+                        <!-- Bloque de la etiqueta con tamaño fijo (ej. 50x20mm) dentro del A4 -->
+                        <div style="width: 50mm; height: 20mm; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            <div style="text-align: center; font-family: 'Arial', sans-serif; font-size: 12px; font-weight: bold; line-height: 1.2;">
                                 <span t-field="o.identificador_final"/>
                             </div>
                         </div>
-                    </t>
+                        <p style="font-size: 10px; color: #666; margin-top: 5px;">Recorte por la línea punteada para obtener su etiqueta.</p>
+                    </div>
                 </t>
             </t>
         </template>
