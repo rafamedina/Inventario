@@ -6,3 +6,4 @@ access_plans_alert,plans.alert.access,model_plans_alert,base.group_user,1,1,1,1
 access_inventory_category,inventory.category.access,model_inventory_category,base.group_user,1,1,1,1
 access_inventory_subcategory,inventory.subcategory.access,model_inventory_subcategory,base.group_user,1,1,1,1
 access_inventory_location,inventory.location.access,model_inventory_location,base.group_user,1,1,1,1
+access_inventory_asset_history,inventory.asset.history.access,model_inventory_asset_history,base.group_user,1,1,1,1

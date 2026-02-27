@@ -1,6 +1,9 @@
 <odoo>
   <data>
 
+    <!-- ==========================================
+         VISTAS PARA CATEGORÍAS
+         ========================================== -->
     <record id="view_inventory_category_tree" model="ir.ui.view">
         <field name="name">inventory.category.tree</field>
         <field name="model">inventory.category</field>
@@ -30,6 +33,9 @@
         </field>
     </record>
 
+    <!-- ==========================================
+         VISTAS PARA SUBCATEGORÍAS
+         ========================================== -->
     <record id="view_inventory_subcategory_tree" model="ir.ui.view">
         <field name="name">inventory.subcategory.tree</field>
         <field name="model">inventory.subcategory</field>
@@ -60,6 +66,9 @@
         </field>
     </record>
 
+    <!-- ==========================================
+         VISTAS PARA LOCALIZACIONES
+         ========================================== -->
     <record id="view_inventory_location_tree" model="ir.ui.view">
         <field name="name">inventory.location.tree</field>
         <field name="model">inventory.location</field>
@@ -89,6 +98,9 @@
         </field>
     </record>
 
+    <!-- ==========================================
+         VISTAS PARA EL ACTIVO (InventoryAsset)
+         ========================================== -->
     <record id="view_inventory_asset_tree" model="ir.ui.view">
         <field name="name">inventory.asset.tree</field>
         <field name="model">inventory.asset</field>
@@ -167,6 +179,17 @@
                              <separator string="Observaciones"/>
                              <field name="notas"/>
                         </page>
+                        <!-- NUEVA PESTAÑA: Trazabilidad -->
+                        <page string="Historial de Asignaciones">
+                            <field name="history_ids" readonly="1">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="old_employee_id"/>
+                                    <field name="new_employee_id"/>
+                                    <field name="role"/>
+                                </tree>
+                            </field>
+                        </page>
                         <page string="Código UUID Interno">
                             <group>
                                 <field name="uuid_activo"/>
@@ -183,6 +206,9 @@
         </field>
     </record>
 
+    <!-- ==========================================
+         VISTAS PARA EL PLAN DE MANTENIMIENTO
+         ========================================== -->
     <record id="view_plans_asset_form" model="ir.ui.view">
         <field name="name">plans.asset.form</field>
         <field name="model">plans.asset</field>
@@ -242,6 +268,81 @@
         </field>
     </record>
 
+    <!-- ==========================================
+         HERENCIA DE EMPLEADOS (hr.employee)
+         ========================================== -->
+    <!-- Vista simplificada para el Inventario -->
+    <record id="view_employee_form_inventory_simple" model="ir.ui.view">
+        <field name="name">hr.employee.form.inventory.simple</field>
+        <field name="model">hr.employee</field>
+        <field name="arch" type="xml">
+            <form string="Empleado (Trazabilidad)">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1><field name="name" readonly="1"/></h1>
+                        <h3><field name="job_title" readonly="1"/></h3>
+                    </div>
+                    <group>
+                        <group string="Información de Contacto">
+                            <field name="work_email" readonly="1"/>
+                            <field name="work_phone" readonly="1"/>
+                            <field name="department_id" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Activos Asignados (Inventario)">
+                            <separator string="Responsabilidades Actuales"/>
+                            <field name="current_responsible_asset_ids" readonly="1">
+                                <tree>
+                                    <field name="identificador_final"/>
+                                    <field name="nombre"/>
+                                    <field name="categoria_id"/>
+                                    <field name="subcategoria_id"/>
+                                </tree>
+                            </field>
+                            <separator string="Propiedades Actuales"/>
+                            <field name="current_owner_asset_ids" readonly="1">
+                                <tree>
+                                    <field name="identificador_final"/>
+                                    <field name="nombre"/>
+                                    <field name="categoria_id"/>
+                                    <field name="subcategoria_id"/>
+                                </tree>
+                            </field>
+                            <separator string="Historial de Asignaciones (Pasadas y Presentes)"/>
+                            <field name="asset_history_ids" readonly="1">
+                                <tree>
+                                    <field name="date"/>
+                                    <field name="asset_id"/>
+                                    <field name="role"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Filtros en la vista búsqueda de empleados -->
+    <record id="view_employee_filter_inherit_inventory" model="ir.ui.view">
+        <field name="name">hr.employee.search.inherit.inventory</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter string="Con Activos Asignados (Responsable)" name="has_responsible_assets" domain="[('current_responsible_asset_ids', '!=', False)]"/>
+                <filter string="Con Activos Asignados (Propietario)" name="has_owned_assets" domain="[('current_owner_asset_ids', '!=', False)]"/>
+                <filter string="Tuvo Activos Históricamente" name="had_assets_history" domain="[('asset_history_ids', '!=', False)]"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- ==========================================
+         ACCIONES Y MENÚS
+         ========================================== -->
     <record id="action_inventory_asset" model="ir.actions.act_window">
         <field name="name">Inventario de Activos</field>
         <field name="res_model">inventory.asset</field>
@@ -249,7 +350,7 @@
     </record>
     <record id="action_plans_asset" model="ir.actions.act_window">
         <field name="name">Planes de Mantenimiento</field>
-        <field name="res_model">plans.asset</field>
+        <field name="res_model" >plans.asset</field>
         <field name="view_mode">tree,form</field>
     </record>
     
@@ -269,10 +370,25 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <!-- Acción para Empleados dentro del Inventario -->
+    <record id="action_inventory_employee" model="ir.actions.act_window">
+        <field name="name">Empleados</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_employee_form_inventory_simple"/>
+        <field name="context">{'search_default_has_responsible_assets': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Administra los empleados y su vinculación con los activos.
+            </p>
+        </field>
+    </record>
+
     <menuitem id="menu_inventory_root" name="Gestión de Activos" sequence="10"/>
     
     <menuitem id="menu_operations" name="Operaciones" parent="menu_inventory_root" sequence="1"/>
     <menuitem id="menu_asset_list" name="Inventario" parent="menu_operations" action="action_inventory_asset" sequence="1"/>
+    <menuitem id="menu_inventory_employees" name="Empleados" parent="menu_operations" action="action_inventory_employee" sequence="2"/>
     
     <menuitem id="menu_maintenance_root" name="Mantenimiento" parent="menu_inventory_root" sequence="2"/>
     <menuitem id="menu_plans_list" name="Planes" parent="menu_maintenance_root" action="action_plans_asset" sequence="1"/>

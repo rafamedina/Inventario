@@ -126,6 +126,9 @@ class InventoryAsset(models.Model):
     responsable_display = fields.Char(string="Responsable", compute="_compute_responsable_display")
     propietario_display = fields.Char(string="Propietario", compute="_compute_propietario_display")
 
+    # Relación con el historial de asignaciones
+    history_ids = fields.One2many('inventory.asset.history', 'asset_id', string="Historial de Asignaciones")
+
     @api.depends('tipo_responsable', 'responsable_empleado_id', 'responsable_departamento_id')
     def _compute_responsable_display(self):
         for record in self:
@@ -288,4 +291,113 @@ class InventoryAsset(models.Model):
         records = super(InventoryAsset, self).create(vals_list)
         for record in records:
             record._compute_identificador_final()
+            
+            # Registro inicial en el historial si hay empleados asignados al crear
+            if record.responsable_empleado_id:
+                self.env['inventory.asset.history'].create({
+                    'asset_id': record.id,
+                    'new_employee_id': record.responsable_empleado_id.id,
+                    'role': 'responsible',
+                    'date': fields.Date.today(),
+                })
+            if record.propietario_empleado_id:
+                self.env['inventory.asset.history'].create({
+                    'asset_id': record.id,
+                    'new_employee_id': record.propietario_empleado_id.id,
+                    'role': 'owner',
+                    'date': fields.Date.today(),
+                })
+                
         return records
+
+    def write(self, vals):
+        """ 
+        Sobrescribimos write para capturar cambios en el responsable y propietario 
+        y registrarlos en el historial de trazabilidad.
+        """
+        for record in self:
+            # Detectar cambio de responsable
+            if 'responsable_empleado_id' in vals:
+                old_id = record.responsable_empleado_id.id
+                new_id = vals.get('responsable_empleado_id')
+                if old_id != new_id:
+                    self.env['inventory.asset.history'].create({
+                        'asset_id': record.id,
+                        'old_employee_id': old_id,
+                        'new_employee_id': new_id,
+                        'role': 'responsible',
+                        'date': fields.Date.today(),
+                    })
+            
+            # Detectar cambio de propietario
+            if 'propietario_empleado_id' in vals:
+                old_id = record.propietario_empleado_id.id
+                new_id = vals.get('propietario_empleado_id')
+                if old_id != new_id:
+                    self.env['inventory.asset.history'].create({
+                        'asset_id': record.id,
+                        'old_employee_id': old_id,
+                        'new_employee_id': new_id,
+                        'role': 'owner',
+                        'date': fields.Date.today(),
+                    })
+                    
+        return super(InventoryAsset, self).write(vals)
+
+# ==========================================
+# HISTORIAL DE ASIGNACIONES (Traceability)
+# ==========================================
+class InventoryAssetHistory(models.Model):
+    _name = 'inventory.asset.history'
+    _description = 'Historial de Asignaciones de Activos'
+    _order = 'date desc, id desc'
+
+    asset_id = fields.Many2one('inventory.asset', string="Activo", required=True, ondelete='cascade')
+    old_employee_id = fields.Many2one('hr.employee', string="Anterior Empleado")
+    new_employee_id = fields.Many2one('hr.employee', string="Nuevo Empleado")
+    role = fields.Selection([
+        ('owner', 'Propietario'),
+        ('responsible', 'Responsable')
+    ], string="Rol", required=True)
+    date = fields.Date(string="Fecha de Cambio", default=fields.Date.today(), required=True)
+
+# ==========================================
+# EXTENSIÓN DE EMPLEADO (hr.employee)
+# ==========================================
+class HrEmployee(models.Model):
+    """ 
+    Extendemos el modelo de empleados para permitir la trazabilidad inversa 
+    desde el propio empleado hacia sus activos asignados.
+    """
+    _inherit = 'hr.employee'
+
+    # Activos donde el empleado es el responsable actual
+    current_responsible_asset_ids = fields.One2many(
+        'inventory.asset', 'responsable_empleado_id', 
+        string="Activos bajo su Responsabilidad (Actual)"
+    )
+
+    # Activos donde el empleado es el propietario actual
+    current_owner_asset_ids = fields.One2many(
+        'inventory.asset', 'propietario_empleado_id', 
+        string="Activos en Propiedad (Actual)"
+    )
+
+    # Historial completo de activos que han pasado por este empleado
+    asset_history_ids = fields.One2many(
+        'inventory.asset.history', 'new_employee_id', 
+        string="Historial de Activos Asignados"
+    )
+
+    # Campo computado para ver la lista de activos únicos que ha tenido históricamente
+    historical_asset_ids = fields.Many2many(
+        'inventory.asset', string="Activos Vinculados Históricamente",
+        compute="_compute_historical_assets"
+    )
+
+    @api.depends('asset_history_ids')
+    def _compute_historical_assets(self):
+        """ Calcula los activos únicos que han estado vinculados al empleado """
+        for employee in self:
+            assets = employee.asset_history_ids.mapped('asset_id')
+            employee.historical_asset_ids = assets
