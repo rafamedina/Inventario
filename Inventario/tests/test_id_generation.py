@@ -63,3 +63,29 @@ class TestIDGeneration(common.TransactionCase):
             'identificador': 'M-PLAN-01'
         })
         self.assertEqual(plan.identificador, 'M-PLAN-01', "Manual Identificador should be preserved")
+
+    def test_identificador_final_computation(self):
+        """ Test that the standardized ID (identificador_final) is computed correctly """
+        # Create a location
+        location = self.env['inventory.location'].create({'nombre': 'Test Location', 'codigo': 'TL'})
+        
+        # Create an asset with category, subcategory and location
+        asset = self.env['inventory.asset'].create({
+            'nombre': 'Standardized Asset',
+            'categoria_id': self.cat.id,
+            'subcategoria_id': self.subcat.id,
+            'ubicacion_id': location.id,
+            'anio_inclusion': '2026'
+        })
+        
+        # Check identificador_final
+        # cat.codigo = TC, subcat.codigo = SC1, location.codigo = TL, anio = 2026
+        # uuid_activo is from sequence, e.g., '0003' if it's the 3rd asset created in this test run
+        expected_start = "TC.SC1.TL."
+        expected_end = ".2026"
+        self.assertTrue(asset.identificador_final.startswith(expected_start), f"Expected prefix {expected_start}, got {asset.identificador_final}")
+        self.assertTrue(asset.identificador_final.endswith(expected_end), f"Expected suffix {expected_end}, got {asset.identificador_final}")
+        
+        # Check fallback (XXX)
+        asset_empty = self.env['inventory.asset'].create({'nombre': 'Empty Asset'})
+        self.assertIn("XXX.XXX.XXX.", asset_empty.identificador_final, "Fallbacks should be XXX")
