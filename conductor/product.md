@@ -18,8 +18,8 @@ Administra el inventario de activos de la compañia Wavext.
 - Subcategory Relationship Mapping: Categorizing assets into logical hierarchies.
 - Bidirectional Traceability: Track assets from the employee record and employees from the asset record.
 - Historical Assignment Logs: Automatic recording of all owner and responsible changes.
-- QR Code Generation: Integrated QR codes on asset records for quick identification and mobile interaction.
-- Automated Label Printing: Support for printing standardized A4 labels containing asset IDs.
+- QR Code Generation: Integrated QR codes on printed labels for quick identification and mobile interaction with the asset record.
+- Automated Label Printing: Support for printing standardized A4 labels containing asset IDs and scannable QR codes.
 
 ## Platform Context
 - Native Odoo Integration: Leveraging standard Odoo modules like HR and Mail.
