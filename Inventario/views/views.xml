@@ -41,12 +41,31 @@
         <field name="model">inventory.subcategory</field>
         <field name="arch" type="xml">
             <tree string="Subcategorías">
+                <field name="categoria_id"/>
                 <field name="codigo"/>
                 <field name="nombre"/>
                 <field name="descripcion"/>
             </tree>
         </field>
     </record>
+
+    <record id="view_inventory_subcategory_search" model="ir.ui.view">
+        <field name="name">inventory.subcategory.search</field>
+        <field name="model">inventory.subcategory</field>
+        <field name="arch" type="xml">
+            <search string="Buscar Subcategorías">
+                <field name="nombre"/>
+                <field name="codigo"/>
+                <field name="categoria_id"/>
+                <separator/>
+                <filter string="Archivado" name="inactive" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Categoría" name="group_by_category" context="{'group_by': 'categoria_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="view_inventory_subcategory_form" model="ir.ui.view">
         <field name="name">inventory.subcategory.form</field>
         <field name="model">inventory.subcategory</field>
