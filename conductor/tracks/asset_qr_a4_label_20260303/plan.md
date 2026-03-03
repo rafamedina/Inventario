@@ -11,11 +11,11 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: QR Code Removal from Form View' (Protocol in workflow.md) 5d35462
 
 ## Phase 3: QR Code Integration into Printed Label (TDD)
-- [x] Task: Write failing test: Verify that the A4 label report template includes a barcode component of type 'QR'. 
-- [ ] Task: Implement change: Update the `report_asset_label_template` QWeb template to include the QR code.
-- [ ] Task: Style change: Position the QR code approximately 2cm to the right of the asset ID/code using inline CSS or a style block.
-- [ ] Task: Implement URL logic: Ensure the QR code encodes the Odoo form view URL for the specific asset.
-- [ ] Task: Verify tests pass and check the generated PDF report output.
+- [x] Task: Write failing test: Verify that the A4 label report template includes a barcode component of type 'QR'. df8098c
+- [x] Task: Implement change: Update the `report_asset_label_template` QWeb template to include the QR code. df8098c
+- [x] Task: Style change: Position the QR code approximately 2cm to the right of the asset ID/code using inline CSS or a style block. df8098c
+- [x] Task: Implement URL logic: Ensure the QR code encodes the Odoo form view URL for the specific asset. df8098c
+- [x] Task: Verify tests pass and check the generated PDF report output. df8098c
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: QR Code Integration into Printed Label' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification and Cleanup
