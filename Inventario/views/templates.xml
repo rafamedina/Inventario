@@ -23,9 +23,13 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <!-- Bloque de la etiqueta con tamaño fijo (ej. 50x20mm) dentro del A4 -->
-                        <div style="width: 50mm; height: 20mm; border: 1px dashed #ccc; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-                            <div style="text-align: center; font-family: 'Arial', sans-serif; font-size: 12px; font-weight: bold; line-height: 1.2;">
+                        <div style="width: 80mm; height: 30mm; border: 1px dashed #ccc; display: flex; align-items: center; padding-left: 5mm; overflow: hidden;">
+                            <div style="text-align: left; font-family: 'Arial', sans-serif; font-size: 14px; font-weight: bold; line-height: 1.2;">
                                 <span t-field="o.identificador_final"/>
+                            </div>
+                            <!-- QR Code posicionado a la derecha del código -->
+                            <div style="margin-left: 20mm;">
+                                <div t-field="o.identificador_final" t-options="{'widget': 'barcode', 'type': 'QR', 'width': 100, 'height': 100, 'humanreadable': 0, 'value': 'web.base.url' + '/web#id=' + str(o.id) + '&amp;model=inventory.asset&amp;view_type=form'}"/>
                             </div>
                         </div>
                         <p style="font-size: 10px; color: #666; margin-top: 5px;">Recorte por la línea punteada para obtener su etiqueta.</p>
