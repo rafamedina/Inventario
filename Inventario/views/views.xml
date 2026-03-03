@@ -310,7 +310,6 @@
             <form string="Empleado (Trazabilidad)">
                 <sheet>
                     <div class="oe_button_box" name="button_box">
-                        <!-- Podríamos añadir aquí botones inteligentes si fuera necesario -->
                     </div>
                     <widget name="web_ribbon" title="Archivado" bg_color="text-bg-danger" invisible="active"/>
                     <field name="image_1920" widget="image" class="oe_avatar" options="{'preview_image': 'image_128'}"/>
@@ -354,7 +353,8 @@
                             <field name="asset_history_ids" readonly="1">
                                 <tree>
                                     <field name="date"/>
-                                    <field name="asset_id"/>
+                                    <field name="identificador_final" string="ID Activo"/>
+                                    <field name="asset_id" string="Nombre" optional="hide"/>
                                     <field name="role"/>
                                 </tree>
                             </field>

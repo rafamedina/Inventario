@@ -389,6 +389,7 @@ class InventoryAssetHistory(models.Model):
     _order = 'date desc, id desc'
 
     asset_id = fields.Many2one('inventory.asset', string="Activo", required=True, ondelete='cascade')
+    identificador_final = fields.Char(related='asset_id.identificador_final', string="ID Estandarizado", store=True)
     old_employee_id = fields.Many2one('hr.employee', string="Anterior Empleado")
     new_employee_id = fields.Many2one('hr.employee', string="Nuevo Empleado")
     role = fields.Selection([
