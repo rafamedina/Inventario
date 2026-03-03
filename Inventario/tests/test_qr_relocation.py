@@ -14,6 +14,5 @@ class TestQRRelocation(common.TransactionCase):
         """ Test that the QR code is now present in the label report template """
         template = self.env.ref('Inventario.report_asset_label_template')
         arch = template.arch
-        # This test will pass when the barcode component is in the template
-        self.assertIn('barcode', arch, "The label report template should contain a barcode component")
-        self.assertIn("'type': 'QR'", arch, "The barcode component should be of type 'QR'")
+        # Check for image tag with qr_code field
+        self.assertIn('t-att-src="image_data_uri(o.qr_code)"', arch, "The label report template should contain an image tag for the QR code")

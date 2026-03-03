@@ -197,13 +197,13 @@ class InventoryAsset(models.Model):
     @api.depends('identificador_final')
     def _compute_qr_code(self):
         """ 
-        Genera una imagen PNG del código QR que contiene la URL de impresión.
+        Genera una imagen PNG del código QR que contiene la URL de la ficha del activo.
         """
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         for record in self:
             if record.id:
-                # URL que disparará la impresión al escanear
-                url = f"{base_url}/inventory/asset/print/{record.id}"
+                # URL de la ficha del producto en Odoo
+                url = f"{base_url}/web#id={record.id}&model=inventory.asset&view_type=form"
                 
                 # Generación del código QR
                 qr = qrcode.QRCode(
