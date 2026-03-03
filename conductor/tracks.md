@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Asset QR Code Relocation and Label Printing**
+- [x] **Track: Asset QR Code Relocation and Label Printing**
 *Link: [./tracks/asset_qr_a4_label_20260303/](./tracks/asset_qr_a4_label_20260303/)*

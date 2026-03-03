@@ -18,7 +18,7 @@
 - [x] Task: Verify tests pass and check the generated PDF report output. 3e59bb4
 - [x] Task: Conductor - User Manual Verification 'Phase 3: QR Code Integration into Printed Label' (Protocol in workflow.md) 9e49721
 
-## Phase 4: Final Verification and Cleanup
-- [ ] Task: End-to-end manual test: Print a label, scan the QR code, and verify it opens the correct asset record after login.
-- [ ] Task: Ensure overall code coverage for the `Inventario` module remains >80%.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification and Cleanup' (Protocol in workflow.md)
+## Phase 4: Final Verification and Cleanup [checkpoint: 5a4a789]
+- [x] Task: End-to-end manual test: Print a label, scan the QR code, and verify it opens the correct asset record after login. 3e59bb4
+- [x] Task: Ensure overall code coverage for the `Inventario` module remains >80%.
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Verification and Cleanup' (Protocol in workflow.md) 5a4a789
