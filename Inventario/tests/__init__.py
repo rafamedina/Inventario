@@ -5,3 +5,4 @@ from . import test_maintenance_lifecycle
 from . import test_asset_traceability
 from . import test_asset_qr
 from . import test_employee_history_ui
+from . import test_qr_relocation

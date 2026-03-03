@@ -148,8 +148,7 @@
                     <button name="action_maintenance_done" string="Registrar Mantenimiento" type="object" class="oe_highlight"/>
                     <!-- Botón para imprimir la etiqueta en A4 -->
                     <button name="%(action_report_asset_label)d" string="Imprimir ID" type="action" class="oe_highlight"/>
-                    <!-- QR Code movido al header, a la derecha de los botones -->
-                    <field name="qr_code" widget="image" options='{"size": [60, 60]}' readonly="1" class="ms-3"/>
+                    <!-- QR Code movido al reporte de etiqueta A4 -->
 
                     
                 </header>
