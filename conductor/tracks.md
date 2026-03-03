@@ -11,8 +11,3 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Asset QR and Label Printing**
 *Link: [./tracks/asset_qr_label_20260227/](./tracks/asset_qr_label_20260227/)*
-
----
-
-- [x] **Track: Fix Subcategory Migration Linkage**
-*Link: [./tracks/subcategory_migration_fix_20260303/](./tracks/subcategory_migration_fix_20260303/)*
