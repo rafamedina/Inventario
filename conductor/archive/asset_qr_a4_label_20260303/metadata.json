@@ -1,0 +1,8 @@
+{
+  "track_id": "asset_qr_a4_label_20260303",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-03-03T11:00:00Z",
+  "updated_at": "2026-03-03T11:00:00Z",
+  "description": "Relocate QR code from form view header (incorrectly referred to as kanban) to the printed A4 label. The QR will link back to the asset's Odoo form view."
+}
