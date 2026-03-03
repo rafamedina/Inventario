@@ -7,3 +7,5 @@ access_inventory_category,inventory.category.access,model_inventory_category,bas
 access_inventory_subcategory,inventory.subcategory.access,model_inventory_subcategory,base.group_user,1,1,1,1
 access_inventory_location,inventory.location.access,model_inventory_location,base.group_user,1,1,1,1
 access_inventory_asset_history,inventory.asset.history.access,model_inventory_asset_history,base.group_user,1,1,1,1
+access_inventory_asset_maintenance,inventory.asset.maintenance.access,model_inventory_asset_maintenance,base.group_user,1,1,1,1
+access_inventory_asset_maintenance_line,inventory.asset.maintenance.line.access,model_inventory_asset_maintenance_line,base.group_user,1,1,1,1

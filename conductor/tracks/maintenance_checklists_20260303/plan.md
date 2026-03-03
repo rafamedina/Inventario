@@ -1,39 +1,33 @@
 # Implementation Plan: Maintenance Checklists and History
 
-## Phase 1: Data Models and Security
-- [ ] Task: Define Maintenance Plan Templates (`maintenance.plan`, `maintenance.plan.item`)
-    - [ ] Write tests for template creation and item relationships.
-    - [ ] Implement `maintenance.plan` and `maintenance.plan.item` models.
-- [ ] Task: Define Maintenance Instance Models (`product.maintenance.instance`, `product.maintenance.item`)
-    - [ ] Write tests for maintenance instantiation from templates.
-    - [ ] Implement `product.maintenance.instance` and `product.maintenance.item` models.
-- [ ] Task: Security and Access Rights
-    - [ ] Define CRUD access for all module users in `ir.model.access.csv`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Models and Security' (Protocol in workflow.md)
+## Phase 1: Tracking Models and History
+- [x] Task: Modelo de Instancia de Mantenimiento (`inventory.asset.maintenance`)
+    - [x] Escribir tests para la creación de instancias con sus líneas de checklist.
+    - [x] Implementar el modelo `inventory.asset.maintenance` y sus líneas (`inventory.asset.maintenance.line`).
+- [x] Task: Extensión de `inventory.asset` para seguimiento
+    - [x] Añadir campos `estado_mantenimiento_proceso`, `mantenimiento_activo_id`.
+    - [x] Configurar la relación `mantenimiento_history_ids` (One2many al historial).
+- [x] Task: Security and Access Rights
+    - [x] Define CRUD access for all module users in `ir.model.access.csv`.
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Modelos de Seguimiento y Historial' (Protocol in workflow.md)
 
-## Phase 2: Product Integration and Basic UI
-- [ ] Task: Extend Product Model
-    - [ ] Write tests for product-maintenance relationship.
-    - [ ] Add `maintenance_ids` field to the asset product model.
-- [ ] Task: Maintenance Plan Views (Templates)
-    - [ ] Create List and Form views for `maintenance.plan`.
-    - [ ] Add menu item for Maintenance Plans.
-- [ ] Task: Product History View
-    - [ ] Modify the product form view to add the "Maintenance History" tab.
-    - [ ] Display a list of maintenance instances within the tab.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Product Integration and Basic UI' (Protocol in workflow.md)
+## Phase 2: Lógica de Negocio (Checks e Imágenes)
+- [ ] Task: Acción "Iniciar Mantenimiento"
+    - [ ] Escribir tests para la creación automática del checklist desde el plan.
+    - [ ] Implementar método `action_start_maintenance()` que copie las `tarea_ids` del plan a las líneas de la instancia.
+- [ ] Task: Acción "Finalizar Mantenimiento"
+    - [ ] Escribir tests para el archivado y actualización de fechas.
+    - [ ] Implementar método `action_finish_maintenance()` que marque el estado del activo como `realizado`, actualice la fecha del último mantenimiento y cierre la instancia.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Lógica de Negocio (Checks e Imágenes)' (Protocol in workflow.md)
 
-## Phase 3: Checklist Workflow and Logic
-- [ ] Task: Assignment Logic
-    - [ ] Write tests for the "Assign Plan" action.
-    - [ ] Implement a button/method to create a new maintenance instance from a plan template.
-- [ ] Task: Interactive Checklist and Image Uploads
-    - [ ] Write tests for checking items and uploading binary images.
-    - [ ] Update `product.maintenance.item` view to allow marking `is_done` and uploading `image`.
-- [ ] Task: Status Tracking and Auto-completion
-    - [ ] Write tests for status transitions ('in_progress' to 'done').
-    - [ ] Implement logic to mark an instance as 'done' once all items are checked.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Checklist Workflow and Logic' (Protocol in workflow.md)
+## Phase 3: Interfaz de Usuario (UI)
+- [ ] Task: Checklist interactivo en el Formulario del Producto
+    - [ ] Añadir sección/pestaña con el checklist activo (si existe).
+    - [ ] Configurar botones de acción ("Iniciar", "Finalizar").
+- [ ] Task: Pestaña de Historial de Mantenimientos
+    - [ ] Añadir pestaña "Historial de Mantenimientos" con la lista de instancias finalizadas.
+    - [ ] Permitir ver los detalles de cada mantenimiento pasado (incluyendo las fotos).
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Interfaz de Usuario (UI)' (Protocol in workflow.md)
 
 ## Phase 4: Final Polishing and Validation
 - [ ] Task: Final UI Enhancements

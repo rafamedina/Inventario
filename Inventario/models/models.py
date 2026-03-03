@@ -102,6 +102,45 @@ class PlansAsset(models.Model):
         return super(PlansAsset, self).create(vals_list)
 
 # ==========================================
+# NUEVOS MODELOS DE SEGUIMIENTO (CHECKLIST E HISTORIAL)
+# ==========================================
+class InventoryAssetMaintenance(models.Model):
+    _name = 'inventory.asset.maintenance'
+    _description = 'Instancia de Mantenimiento de Activo'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _order = 'fecha_inicio desc'
+
+    asset_id = fields.Many2one('inventory.asset', string="Activo", required=True, ondelete='cascade')
+    plan_id = fields.Many2one('plans.asset', string="Plan Original")
+    
+    fecha_inicio = fields.Date(string="Fecha de Inicio", default=fields.Date.today(), tracking=True)
+    fecha_fin = fields.Date(string="Fecha de Finalización", readonly=True, tracking=True)
+    
+    state = fields.Selection([
+        ('in_progress', 'En Proceso'),
+        ('done', 'Realizado')
+    ], string="Estado", default='in_progress', tracking=True)
+    
+    checklist_line_ids = fields.One2many('inventory.asset.maintenance.line', 'maintenance_id', string="Checklist")
+
+    display_name = fields.Char(compute='_compute_display_name')
+
+    @api.depends('asset_id', 'plan_id', 'fecha_inicio')
+    def _compute_display_name(self):
+        for rec in self:
+            plan_name = rec.plan_id.nombre if rec.plan_id else 'Mantenimiento'
+            rec.display_name = f"{plan_name} - {rec.asset_id.nombre} ({rec.fecha_inicio})"
+
+class InventoryAssetMaintenanceLine(models.Model):
+    _name = 'inventory.asset.maintenance.line'
+    _description = 'Línea de Checklist de Mantenimiento'
+
+    maintenance_id = fields.Many2one('inventory.asset.maintenance', string="Mantenimiento", ondelete='cascade')
+    name = fields.Char(string="Tarea", required=True)
+    is_done = fields.Boolean(string="Hecho", default=False)
+    image = fields.Binary(string="Imagen / Evidencia")
+
+# ==========================================
 # EL ACTIVO (InventoryAsset)
 # ==========================================
 class InventoryAsset(models.Model):
@@ -162,6 +201,16 @@ class InventoryAsset(models.Model):
     
     # Filtro automático
     plan_id = fields.Many2one('plans.asset', string='Plan de Mantenimiento', tracking=True, domain="[('subcategoria_id', '=', subcategoria_id)]")
+
+    # --- Seguimiento de Mantenimiento ---
+    estado_mantenimiento_proceso = fields.Selection([
+        ('no_iniciado', 'No Iniciado'),
+        ('en_proceso', 'En Proceso'),
+        ('realizado', 'Realizado')
+    ], string="Estado Proceso Mant.", default='no_iniciado', tracking=True)
+    
+    mantenimiento_activo_id = fields.Many2one('inventory.asset.maintenance', string="Mantenimiento Actual", readonly=True)
+    mantenimiento_history_ids = fields.One2many('inventory.asset.maintenance', 'asset_id', string="Historial de Mantenimientos", domain=[('state', '=', 'done')])
 
     # ==========================================
     # CAMPOS RELACIONALES (Sustituyen a las listas fijas)
