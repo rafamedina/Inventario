@@ -4,11 +4,11 @@
 - [x] Task: Review existing label report and form view definitions in `views/views.xml` and `views/templates.xml`. 
 - [x] Task: Identify the exact URL structure needed for the QR code to link to the asset form view. 
 
-## Phase 2: QR Code Removal from Form View (TDD)
+## Phase 2: QR Code Removal from Form View (TDD) [checkpoint: 5d35462]
 - [x] Task: Write failing test: Verify that the asset form view does NOT contain the `qr_code` element in the header. 1acc300
 - [x] Task: Implement change: Remove the `qr_code` field definition from the Asset form view header in `views/views.xml`. 1acc300
 - [x] Task: Verify tests pass. 1acc300
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: QR Code Removal from Form View' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: QR Code Removal from Form View' (Protocol in workflow.md) 5d35462
 
 ## Phase 3: QR Code Integration into Printed Label (TDD)
 - [x] Task: Write failing test: Verify that the A4 label report template includes a barcode component of type 'QR'. 
