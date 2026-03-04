@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Global module integrity cleanup and test updates**
+- [~] **Track: Global module integrity cleanup and test updates**
 *Link: [./tracks/global_integrity_20260304/](./tracks/global_integrity_20260304/)*
