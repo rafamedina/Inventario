@@ -11,3 +11,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Asset QR and Label Printing**
 *Link: [./tracks/asset_qr_label_20260227/](./tracks/asset_qr_label_20260227/)*
+
+---
+
+- [ ] **Track: Global module integrity cleanup and test updates**
+*Link: [./tracks/global_integrity_20260304/](./tracks/global_integrity_20260304/)*
