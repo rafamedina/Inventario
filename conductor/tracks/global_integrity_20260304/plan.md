@@ -26,3 +26,6 @@ Ensure consistency across the module.
 - [x] Task: Final XML Grep
     - [x] Search for any other `hr.employee` inherited fields that might be missing group protection.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Final Audit and Cleanup' (Protocol in workflow.md)
+
+## Phase: Review Fixes
+- [x] Task: Apply review suggestions 7e3b6a0
