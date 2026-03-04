@@ -23,6 +23,6 @@ Bring the test suite back to a green state.
 ## Phase 3: Final Audit and Cleanup
 Ensure consistency across the module.
 
-- [~] Task: Final XML Grep
-    - [ ] Search for any other `hr.employee` inherited fields that might be missing group protection.
+- [x] Task: Final XML Grep
+    - [x] Search for any other `hr.employee` inherited fields that might be missing group protection.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Final Audit and Cleanup' (Protocol in workflow.md)
