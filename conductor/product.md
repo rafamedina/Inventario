@@ -23,6 +23,8 @@ Administra el inventario de activos de la compañia Wavext.
 - Evidence Tracking: Support for uploading images per checklist item as proof of maintenance work.
 - Detailed Maintenance History: Full historical record of all maintenance events accessible from the asset record.
 - Automated Label Printing: Support for printing standardized A4 labels containing asset IDs and scannable QR codes.
+- Enterprise-Grade Data Integrity: Strict business rules to prevent accidental deletion of categories, locations, or historical maintenance records.
+- Database-Level Uniqueness: Enforced unique asset identifiers using SQL constraints.
 
 ## Security and Access Control
 - Module-Level Visibility: Access to the module is restricted to a specific security group.
