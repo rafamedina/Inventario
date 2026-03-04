@@ -29,8 +29,8 @@ Hide the module's root menu for unauthorized users.
 
 - [x] Task: Update Menu Visibility d394169
     - [x] Edit `Inventario/views/views.xml` to add `groups="group_inventory_manager"` to the `menu_inventory_root` menuitem.
-- [~] Task: TDD - Verify Menu Visibility
-    - [ ] Write a test to check if the root menu is returned in the menu tree for a user in the group and not for a standard user.
+- [x] Task: TDD - Verify Menu Visibility 5560567
+    - [x] Write a test to check if the root menu is returned in the menu tree for a user in the group and not for a standard user.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Menu Restriction' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification and Cleanup
