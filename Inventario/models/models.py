@@ -147,6 +147,12 @@ class InventoryAssetMaintenance(models.Model):
             plan_name = rec.plan_id.nombre if rec.plan_id else 'Mantenimiento'
             rec.display_name = f"{plan_name} - {rec.asset_id.nombre} ({rec.fecha_inicio})"
 
+    def unlink(self):
+        for record in self:
+            if record.state == 'done' and not self.env.user.has_group('base.group_erp_manager'):
+                raise UserError("⛔ No puedes eliminar un registro de mantenimiento que ya ha sido finalizado. Contacta con tu administrador.")
+        return super(InventoryAssetMaintenance, self).unlink()
+
 class InventoryAssetMaintenanceLine(models.Model):
     _name = 'inventory.asset.maintenance.line'
     _description = 'Línea de Checklist de Mantenimiento'
