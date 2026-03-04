@@ -430,7 +430,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page string="Activos Asignados (Inventario)" name="inventory_assets">
+                        <page string="Activos Asignados (Inventario)" name="inventory_assets" groups="Inventario.group_inventory_manager">
                             <separator string="Responsabilidades Actuales"/>
                             <field name="current_responsible_asset_ids" readonly="1">
                                 <tree>
