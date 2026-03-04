@@ -9,7 +9,7 @@ Address the identified information leakage in the UI.
     - [x] Log in with a standard user and confirm the "Con Activos Asignados" filters are no longer visible in the Employees view.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Security Fixes (Filters)' (Protocol in workflow.md)
 
-## Phase 2: Fix Obsolete Tests [checkpoint: Phase 2 Complete]
+## Phase 2: Fix Obsolete Tests [checkpoint: 6a6e1a7]
 Bring the test suite back to a green state.
 
 - [x] Task: Refactor `test_asset_qr.py` e7a0360
@@ -23,6 +23,6 @@ Bring the test suite back to a green state.
 ## Phase 3: Final Audit and Cleanup
 Ensure consistency across the module.
 
-- [ ] Task: Final XML Grep
+- [~] Task: Final XML Grep
     - [ ] Search for any other `hr.employee` inherited fields that might be missing group protection.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Final Audit and Cleanup' (Protocol in workflow.md)
