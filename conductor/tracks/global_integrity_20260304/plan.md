@@ -3,8 +3,18 @@
 ## Phase 1: Security Fixes (Filters)
 Address the identified information leakage in the UI.
 
-- [ ] Task: Restrict Search Filters
-    - [ ] Edit `Inventario/views/views.xml` to add `groups="group_inventory_manager"` to the filters in `view_employee_filter_inherit_inventory`.
+- [x] Task: Restrict Search Filters 22d8354
+    - [x] Edit `Inventario/views/views.xml` to add `groups="group_inventory_manager"` to the filters in `view_employee_filter_inherit_inventory`.
+- [ ] Task: Manual Verification - Search Filters
+    - [ ] Log in with a standard user and confirm the "Con Activos Asignados" filters are no longer visible in the Employees view.
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Security Fixes (Filters)' (Protocol in workflow.md)
+... User modified the `new_string` content to be: # Implementation Plan: Global Integrity and Test Updates
+
+## Phase 1: Security Fixes (Filters)
+Address the identified information leakage in the UI.
+
+- [x] Task: Restrict Search Filters 22d8354
+    - [x] Edit `Inventario/views/views.xml` to add `groups="group_inventory_manager"` to the filters in `view_employee_filter_inherit_inventory`.
 - [ ] Task: Manual Verification - Search Filters
     - [ ] Log in with a standard user and confirm the "Con Activos Asignados" filters are no longer visible in the Employees view.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Security Fixes (Filters)' (Protocol in workflow.md)
