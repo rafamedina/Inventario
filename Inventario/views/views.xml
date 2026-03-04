@@ -431,8 +431,8 @@
                     </group>
                     <notebook>
                         <page string="Activos Asignados (Inventario)" name="inventory_assets" groups="Inventario.group_inventory_manager">
-                            <separator string="Responsabilidades Actuales"/>
-                            <field name="current_responsible_asset_ids" readonly="1">
+                            <separator string="Responsabilidades Actuales" groups="Inventario.group_inventory_manager"/>
+                            <field name="current_responsible_asset_ids" readonly="1" groups="Inventario.group_inventory_manager">
                                 <tree>
                                     <field name="identificador_final"/>
                                     <field name="nombre"/>
@@ -440,8 +440,8 @@
                                     <field name="subcategoria_id"/>
                                 </tree>
                             </field>
-                            <separator string="Propiedades Actuales"/>
-                            <field name="current_owner_asset_ids" readonly="1">
+                            <separator string="Propiedades Actuales" groups="Inventario.group_inventory_manager"/>
+                            <field name="current_owner_asset_ids" readonly="1" groups="Inventario.group_inventory_manager">
                                 <tree>
                                     <field name="identificador_final"/>
                                     <field name="nombre"/>
@@ -449,8 +449,8 @@
                                     <field name="subcategoria_id"/>
                                 </tree>
                             </field>
-                            <separator string="Historial de Asignaciones (Pasadas y Presentes)"/>
-                            <field name="asset_history_ids" readonly="1">
+                            <separator string="Historial de Asignaciones (Pasadas y Presentes)" groups="Inventario.group_inventory_manager"/>
+                            <field name="asset_history_ids" readonly="1" groups="Inventario.group_inventory_manager">
                                 <tree>
                                     <field name="date"/>
                                     <field name="identificador_final" string="ID Activo"/>
