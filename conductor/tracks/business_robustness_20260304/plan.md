@@ -12,7 +12,7 @@ Create the failing tests that will define our robustness goals.
     - [x] Add the new test file to the imports.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Robustness Infrastructure' (Protocol in workflow.md)
 
-## Phase 2: Implementation of Logic
+## Phase 2: Implementation of Logic [checkpoint: b87a40c]
 Apply the constraints to the models.
 
 - [x] Task: Update `InventoryCategory` and `InventoryLocation` 7894a40
@@ -21,11 +21,11 @@ Apply the constraints to the models.
     - [x] Add `_sql_constraints` for `identificador_final_unique`.
 - [x] Task: Secure Maintenance History 235e33c
     - [x] Override `unlink()` in `inventory.asset.maintenance` to block deletion if `state == 'done'`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Implementation of Logic' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Implementation of Logic' (Protocol in workflow.md)
 
 ## Phase 3: Verification
 Ensure the suite is green.
 
-- [ ] Task: Execute Suite and Verify
+- [~] Task: Execute Suite and Verify
     - [ ] Run all tests and confirm 100% pass rate.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md)
