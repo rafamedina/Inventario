@@ -48,9 +48,16 @@ python3 odoo-bin -r odoo -w odoo --db_host=localhost --addons-path=addons,module
 
   3. Verificación de Integridad Global (Manual con mis
   herramientas)
+
   Si quieres, puedo ejecutar una auditoría ad-hoc combinando mis
   capacidades:
    * Puedo ejecutar todos los tests del módulo a la vez para ver si
      hay conflictos entre diferentes funciones.
    * Puedo buscar patrones específicos (como todos los menús que no
      tengan grupo) para asegurar consistencia.
+
+     
+     /home/ikran/odooInventario17/.venv/bin/python3 \
+/home/ikran/odooInventario17/odoo-bin -r odoo -w odoo \
+--db_host=localhost --addons-path=addons,custom_modules \
+-d odoo17_nueva_pro -i stock --test-enable --stop-after-init
