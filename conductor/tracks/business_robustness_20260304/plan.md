@@ -23,9 +23,9 @@ Apply the constraints to the models.
     - [x] Override `unlink()` in `inventory.asset.maintenance` to block deletion if `state == 'done'`.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Implementation of Logic' (Protocol in workflow.md)
 
-## Phase 3: Verification
+## Phase 3: Verification [checkpoint: 2d05715]
 Ensure the suite is green.
 
 - [x] Task: Execute Suite and Verify 3034477
     - [x] Run all tests and confirm 100% pass rate.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Verification' (Protocol in workflow.md)
