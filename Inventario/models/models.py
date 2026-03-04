@@ -210,6 +210,10 @@ class InventoryAsset(models.Model):
     ], string="Estado Proceso Mant.", default='no_iniciado', tracking=True)
     
     mantenimiento_activo_id = fields.Many2one('inventory.asset.maintenance', string="Mantenimiento Actual", readonly=True)
+    
+    # Campo relacionado para mostrar y editar las líneas del mantenimiento activo desde el activo
+    checklist_activo_ids = fields.One2many('inventory.asset.maintenance.line', related='mantenimiento_activo_id.checklist_line_ids', readonly=False, string="Tareas del Mantenimiento en Proceso")
+    
     mantenimiento_history_ids = fields.One2many('inventory.asset.maintenance', 'asset_id', string="Historial de Mantenimientos", domain=[('state', '=', 'done')])
 
     # ==========================================
@@ -350,6 +354,80 @@ class InventoryAsset(models.Model):
             activity_ids = asset.activity_ids.filtered(lambda a: a.activity_type_id.name == 'To Do') 
             if activity_ids:
                 activity_ids.action_done()
+
+    # --- Nuevas Acciones de Mantenimiento Integrado ---
+    def action_start_maintenance(self):
+        """ 
+        Inicia un proceso de mantenimiento:
+        1. Cambia estado a 'en_proceso'
+        2. Crea una instancia de mantenimiento con checklist basado en el plan
+        """
+        for asset in self:
+            if not asset.plan_id:
+                raise UserError("⛔ Selecciona primero un plan de mantenimiento para este activo.")
+            
+            if asset.mantenimiento_activo_id:
+                raise UserError("⚠️ Ya hay un mantenimiento en proceso para este activo.")
+
+            # Crear la instancia
+            maintenance = self.env['inventory.asset.maintenance'].create({
+                'asset_id': asset.id,
+                'plan_id': asset.plan_id.id,
+                'fecha_inicio': fields.Date.today(),
+                'state': 'in_progress'
+            })
+
+            # Copiar tareas del plan al checklist de la instancia
+            lines = []
+            for task in asset.plan_id.tarea_ids:
+                lines.append((0, 0, {
+                    'name': task.name,
+                    'is_done': False
+                }))
+            
+            maintenance.write({'checklist_line_ids': lines})
+
+            # Actualizar el activo
+            asset.write({
+                'estado_mantenimiento_proceso': 'en_proceso',
+                'mantenimiento_activo_id': maintenance.id
+            })
+            
+            asset.message_post(body=f"🛠️ Mantenimiento iniciado usando el plan: {asset.plan_id.nombre}")
+
+    def action_finish_maintenance(self):
+        """
+        Finaliza el proceso de mantenimiento:
+        1. Verifica que haya un mantenimiento activo
+        2. Cambia estado a 'realizado'
+        3. Actualiza fechas de mantenimiento del activo
+        4. Cierra la instancia de mantenimiento
+        """
+        for asset in self:
+            if not asset.mantenimiento_activo_id:
+                raise UserError("⚠️ No hay ningún mantenimiento en proceso para finalizar.")
+
+            # Validar que todo el checklist esté hecho (opcional, pero recomendado)
+            if not all(asset.mantenimiento_activo_id.checklist_line_ids.mapped('is_done')):
+                 asset.message_post(body="ℹ️ Finalizando mantenimiento con tareas pendientes.")
+
+            # Cerrar la instancia
+            instance = asset.mantenimiento_activo_id
+            instance.write({
+                'state': 'done',
+                'fecha_fin': fields.Date.today()
+            })
+
+            # Actualizar fechas del activo (reutilizando lógica de action_maintenance_done)
+            asset.action_maintenance_done()
+
+            # Limpiar activo y marcar como realizado
+            asset.write({
+                'estado_mantenimiento_proceso': 'realizado',
+                'mantenimiento_activo_id': False
+            })
+
+            asset.message_post(body="✅ Proceso de mantenimiento finalizado y registrado en el historial.")
 
     def action_archive(self):
         for record in self:
