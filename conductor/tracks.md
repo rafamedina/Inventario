@@ -14,5 +14,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [~] **Track: Maintenance checklists with reusable templates, image uploads, and status tracking.**
+- [x] **Track: Maintenance checklists with reusable templates, image uploads, and status tracking.**
 *Link: [./tracks/maintenance_checklists_20260303/](./tracks/maintenance_checklists_20260303/)*
