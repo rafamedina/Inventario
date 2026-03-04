@@ -27,8 +27,9 @@ class TestSecurityGroups(TransactionCase):
             'groups_id': [(6, 0, [self.env.ref('base.group_user').id])]
         })
         
-        # Intentamos leer un activo con ese usuario
-        asset = self.env['inventory.asset'].create({'nombre': 'Asset Prueba'})
+        # Intentamos crear un activo con ese usuario
+        # (Usamos sudo() para crear el registro inicial, luego probamos acceso)
+        asset = self.env['inventory.asset'].sudo().create({'nombre': 'Asset Prueba'})
         
         with self.assertRaises(AccessError):
             asset.with_user(user_no_access).read(['nombre'])
@@ -46,8 +47,35 @@ class TestSecurityGroups(TransactionCase):
         })
         
         # Intentamos leer un activo con ese usuario
-        asset = self.env['inventory.asset'].create({'nombre': 'Asset Prueba'})
+        asset = self.env['inventory.asset'].sudo().create({'nombre': 'Asset Prueba'})
         
         # Esto NO debería lanzar AccessError
         res = asset.with_user(user_access).read(['nombre'])
         self.assertEqual(res[0]['nombre'], 'Asset Prueba')
+
+    def test_menu_visibility(self):
+        """Verificar que el menú raíz solo es visible para el grupo manager."""
+        menu = self.env.ref('Inventario.menu_inventory_root')
+        
+        user_no_access = self.env['res.users'].create({
+            'name': 'Menu No Access',
+            'login': 'menu_no_access',
+            'groups_id': [(6, 0, [self.env.ref('base.group_user').id])]
+        })
+        
+        user_access = self.env['res.users'].create({
+            'name': 'Menu Access',
+            'login': 'menu_access',
+            'groups_id': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref('Inventario.group_inventory_manager').id
+            ])]
+        })
+
+        # Verificar visibilidad (Odoo filtra los menús en la carga del cliente, 
+        # pero podemos verificar si el usuario tiene el grupo requerido)
+        self.assertFalse(menu.with_user(user_no_access)._filter_visible_menus(), 
+                         "El menú NO debería ser visible para un usuario sin el grupo.")
+        
+        self.assertTrue(menu.with_user(user_access)._filter_visible_menus(), 
+                        "El menú DEBERÍA ser visible para un usuario con el grupo.")
