@@ -60,4 +60,4 @@ python3 odoo-bin -r odoo -w odoo --db_host=localhost --addons-path=addons,module
      /home/ikran/odooInventario17/.venv/bin/python3 \
 /home/ikran/odooInventario17/odoo-bin -r odoo -w odoo \
 --db_host=localhost --addons-path=addons,custom_modules \
--d odoo17_nueva_pro -i stock --test-enable --stop-after-init
+-d odoo17_nueva_pro -i Inventario --test-enable --stop-after-init
