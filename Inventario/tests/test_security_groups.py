@@ -32,3 +32,22 @@ class TestSecurityGroups(TransactionCase):
         
         with self.assertRaises(AccessError):
             asset.with_user(user_no_access).read(['nombre'])
+
+    def test_granted_access(self):
+        """Verificar que un usuario con el grupo SI puede acceder a los activos."""
+        # Creamos un usuario con el grupo de inventario
+        user_access = self.env['res.users'].create({
+            'name': 'Test User Access',
+            'login': 'test_access',
+            'groups_id': [(6, 0, [
+                self.env.ref('base.group_user').id,
+                self.env.ref('Inventario.group_inventory_manager').id
+            ])]
+        })
+        
+        # Intentamos leer un activo con ese usuario
+        asset = self.env['inventory.asset'].create({'nombre': 'Asset Prueba'})
+        
+        # Esto NO debería lanzar AccessError
+        res = asset.with_user(user_access).read(['nombre'])
+        self.assertEqual(res[0]['nombre'], 'Asset Prueba')
