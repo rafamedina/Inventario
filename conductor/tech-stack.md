@@ -10,6 +10,9 @@
 - **`mail`**: Messaging, internal communications, and automated email notifications.
 - **`hr`**: Human Resources integration for managing employee-asset relationships.
 
+## Security Maintenance
+- **Dependency Guard**: Critical libraries (cryptography, gevent, Jinja2, etc.) are actively updated to mitigate known vulnerabilities (RCE, DoS).
+
 ## Frontend & Templating
 - **XML Views**: Standard Odoo XML-based view definitions (Form, List, Kanban).
 - **QWeb Templates**: Standard Odoo QWeb engine for server-side rendering.
