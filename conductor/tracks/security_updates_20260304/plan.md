@@ -26,6 +26,6 @@ Verify the stability and functionality of the module.
 ## Phase 4: Final Cleanup
 Finalize the track and remove temporary artifacts.
 
-- [ ] Task: Cleanup Backup Files
+- [~] Task: Cleanup Backup Files
     - [ ] Remove `requirements_backup_20260304.txt`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Cleanup' (Protocol in workflow.md)
