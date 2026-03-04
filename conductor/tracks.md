@@ -15,5 +15,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Business Robustness and Data Integrity**
+- [~] **Track: Business Robustness and Data Integrity**
 *Link: [./tracks/business_robustness_20260304/](./tracks/business_robustness_20260304/)*
