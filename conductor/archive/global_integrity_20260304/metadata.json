@@ -1,0 +1,8 @@
+{
+  "track_id": "global_integrity_20260304",
+  "type": "chore",
+  "status": "new",
+  "created_at": "2026-03-04T11:00:00Z",
+  "updated_at": "2026-03-04T11:00:00Z",
+  "description": "Global module integrity cleanup: restrict search filters for privacy and update obsolete tests (QR relocation and subcategory logic)."
+}
