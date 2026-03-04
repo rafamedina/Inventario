@@ -473,9 +473,9 @@
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='inactive']" position="after">
                 <separator/>
-                <filter string="Con Activos Asignados (Responsable)" name="has_responsible_assets" domain="[('current_responsible_asset_ids', '!=', False)]"/>
-                <filter string="Con Activos Asignados (Propietario)" name="has_owned_assets" domain="[('current_owner_asset_ids', '!=', False)]"/>
-                <filter string="Tuvo Activos Históricamente" name="had_assets_history" domain="[('asset_history_ids', '!=', False)]"/>
+                <filter string="Con Activos Asignados (Responsable)" name="has_responsible_assets" domain="[('current_responsible_asset_ids', '!=', False)]" groups="Inventario.group_inventory_manager"/>
+                <filter string="Con Activos Asignados (Propietario)" name="has_owned_assets" domain="[('current_owner_asset_ids', '!=', False)]" groups="Inventario.group_inventory_manager"/>
+                <filter string="Tuvo Activos Históricamente" name="had_assets_history" domain="[('asset_history_ids', '!=', False)]" groups="Inventario.group_inventory_manager"/>
             </xpath>
         </field>
     </record>
