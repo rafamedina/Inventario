@@ -90,7 +90,9 @@ class TestSubcategoryLink(common.TransactionCase):
             self.assertTrue(sub.categoria_id, "Subcategory should be linked after hook")
             self.assertEqual(sub.categoria_id.nombre, 'EQUIPOS')
             
-            # Cleanup: Remove the test record before restoring NOT NULL
+            # Cleanup: Remove dependencies before unlinking subcategory to avoid FK error
+            plans = self.env['plans.asset'].search([('subcategoria_id', '=', sub.id)])
+            plans.unlink()
             sub.unlink()
         finally:
             # Restore NOT NULL always
