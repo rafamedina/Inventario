@@ -14,9 +14,9 @@ Bring the test suite back to a green state.
 
 - [x] Task: Refactor `test_asset_qr.py` e7a0360
     - [x] Update `test_ui_elements_in_view` to verify the QR code is NOT in the form view header (assert absent).
-- [~] Task: Fix `test_subcategory_link.py`
-    - [ ] Investigate and fix the `ForeignKeyViolation` during `sub.unlink()` in `test_migration_logic`. Likely need to unlink related plans first.
-- [ ] Task: Execute Suite and Verify
+- [x] Task: Fix `test_subcategory_link.py` ba1bdd1
+    - [x] Investigate and fix the `ForeignKeyViolation` during `sub.unlink()` in `test_migration_logic`. Likely need to unlink related plans first.
+- [~] Task: Execute Suite and Verify
     - [ ] Run all tests and confirm 100% pass rate for the module.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Fix Obsolete Tests' (Protocol in workflow.md)
 
