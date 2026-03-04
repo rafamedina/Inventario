@@ -24,19 +24,19 @@ Restrict CRUD operations on models to the new security group.
     - [x] Update `view_employee_form_inventory_simple` in `views.xml` to restrict the "Activos Asignados" page to the `group_inventory_manager`.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Apply Access Rights' (Protocol in workflow.md)
 
-## Phase 3: Menu Restriction
+## Phase 3: Menu Restriction [checkpoint: a02f98f]
 Hide the module's root menu for unauthorized users.
 
 - [x] Task: Update Menu Visibility d394169
     - [x] Edit `Inventario/views/views.xml` to add `groups="group_inventory_manager"` to the `menu_inventory_root` menuitem.
 - [x] Task: TDD - Verify Menu Visibility 5560567
     - [x] Write a test to check if the root menu is returned in the menu tree for a user in the group and not for a standard user.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Menu Restriction' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Menu Restriction' (Protocol in workflow.md)
 
 ## Phase 4: Final Verification and Cleanup
 Perform end-to-end checks and ensure consistency.
 
-- [ ] Task: Full Test Suite Execution
+- [~] Task: Full Test Suite Execution
     - [ ] Run all module tests to ensure no regressions.
 - [ ] Task: Documentation Update
     - [ ] (Optional) Add a brief note in a README or similar file about how to grant access.
