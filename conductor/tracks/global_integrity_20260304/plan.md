@@ -1,6 +1,6 @@
 # Implementation Plan: Global Integrity and Test Updates
 
-## Phase 1: Security Fixes (Filters) [checkpoint: Phase 1 Complete]
+## Phase 1: Security Fixes (Filters) [checkpoint: 37e1b24]
 Address the identified information leakage in the UI.
 
 - [x] Task: Restrict Search Filters 22d8354
@@ -12,7 +12,7 @@ Address the identified information leakage in the UI.
 ## Phase 2: Fix Obsolete Tests
 Bring the test suite back to a green state.
 
-- [ ] Task: Refactor `test_asset_qr.py`
+- [~] Task: Refactor `test_asset_qr.py`
     - [ ] Update `test_ui_elements_in_view` to verify the QR code is NOT in the form view header (assert absent).
     - [ ] (Optional) Add a check to verify the QR logic still works for the report template.
 - [ ] Task: Fix `test_subcategory_link.py`
