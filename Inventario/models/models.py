@@ -18,6 +18,14 @@ class InventoryCategory(models.Model):
     codigo = fields.Char(string='Código', required=True, help="Ej: APP, HW, NET...")
     descripcion = fields.Text(string='Descripción')
 
+    def unlink(self):
+        for record in self:
+            # Verificar si hay activos vinculados a esta categoría
+            assets = self.env['inventory.asset'].search([('categoria_id', '=', record.id)], limit=1)
+            if assets:
+                raise UserError(f"⛔ No puedes eliminar la categoría '{record.nombre}' porque tiene activos asociados.")
+        return super(InventoryCategory, self).unlink()
+
 class InventorySubcategory(models.Model):
     _name = 'inventory.subcategory'
     _description = 'Subcategoría de Activo'
@@ -38,6 +46,14 @@ class InventoryLocation(models.Model):
     nombre = fields.Char(string='Nombre', required=True)
     codigo = fields.Char(string='Código', required=True, help="Ej: BOA, ILAB, AWS...")
     descripcion = fields.Text(string='Descripción')
+
+    def unlink(self):
+        for record in self:
+            # Verificar si hay activos vinculados a esta ubicación
+            assets = self.env['inventory.asset'].search([('ubicacion_id', '=', record.id)], limit=1)
+            if assets:
+                raise UserError(f"⛔ No puedes eliminar la localización '{record.nombre}' porque tiene activos asociados.")
+        return super(InventoryLocation, self).unlink()
 
 
 # ==========================================
