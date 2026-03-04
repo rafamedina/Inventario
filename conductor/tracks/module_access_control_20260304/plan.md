@@ -3,13 +3,27 @@
 ## Phase 1: Define Security Group
 Create the foundational security group for managing access to the module.
 
-- [ ] Task: Create security XML file
-    - [ ] Create `Inventario/security/security_groups.xml` defining `group_inventory_manager` as "Inventory / Full Access".
+- [x] Task: Create security XML file 87f5f4a
+    - [x] Create `Inventario/security/security_groups.xml` defining `group_inventory_manager` as "Inventory / Full Access".
+- [ ] Task: Update Manifest
+    - [ ] Add `security/security_groups.xml` to the `data` list in `Inventario/__manifest__.py` (it MUST be loaded before `ir.model.access.csv`).
+- [ ] Task: TDD - Verify Group Creation
+    - [ ] Write a test case in a new test file `Inventario/tests/test_security_groups.py` to ensure the group is correctly created in the database.
+... User modified the `new_string` content to be: # Implementation Plan: Module Access Control for Inventario
+
+## Phase 1: Define Security Group
+Create the foundational security group for managing access to the module.
+
+- [x] Task: Create security XML file 87f5f4a
+    - [x] Create `Inventario/security/security_groups.xml` defining `group_inventory_manager` as "Inventory / Full Access".
 - [ ] Task: Update Manifest
     - [ ] Add `security/security_groups.xml` to the `data` list in `Inventario/__manifest__.py` (it MUST be loaded before `ir.model.access.csv`).
 - [ ] Task: TDD - Verify Group Creation
     - [ ] Write a test case in a new test file `Inventario/tests/test_security_groups.py` to ensure the group is correctly created in the database.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Define Security Group' (Protocol in workflow.md)
+
+## Phase 2: Apply Access Rights
+Restrict CRUD operations on models to the new security group.
 
 ## Phase 2: Apply Access Rights
 Restrict CRUD operations on models to the new security group.
