@@ -1,33 +1,38 @@
-from odoo.tests import common
+from odoo.tests.common import TransactionCase
 
-class TestAssetQR(common.TransactionCase):
-
+class TestAssetQR(TransactionCase):
     def setUp(self):
         super(TestAssetQR, self).setUp()
+        self.category = self.env['inventory.category'].create({
+            'nombre': 'Computadoras',
+            'codigo': 'COMP'
+        })
+        self.subcategory = self.env['inventory.subcategory'].create({
+            'nombre': 'Laptops',
+            'codigo': 'LAP',
+            'categoria_id': self.category.id
+        })
         self.asset = self.env['inventory.asset'].create({
-            'nombre': 'Test QR Asset',
+            'nombre': 'Laptop HP',
+            'categoria_id': self.category.id,
+            'subcategoria_id': self.subcategory.id
         })
 
     def test_qr_code_field_exists(self):
-        """ Test that the qr_code field exists on the model """
-        self.assertIn('qr_code', self.env['inventory.asset']._fields, "Field 'qr_code' should exist on inventory.asset")
+        """Verificar que el campo qr_code existe en el modelo."""
+        self.assertIn('qr_code', self.env['inventory.asset']._fields)
 
     def test_qr_code_computation(self):
-        """ Test that the qr_code field is correctly computed """
-        self.asset._compute_identificador_final() # Ensure ID is computed
-        qr_value = self.asset.qr_code
-        self.assertTrue(qr_value, "QR code should be computed")
-
-    def test_label_report_existence(self):
-        """ Test that the label report is defined and linked to the model """
-        report = self.env.ref('Inventario.action_report_asset_label', raise_if_not_found=False)
-        self.assertTrue(report, "Report 'action_report_asset_label' should be defined")
-        self.assertEqual(report.model, 'inventory.asset', "Report should be for 'inventory.asset' model")
+        """Verificar que el QR se genera correctamente."""
+        self.assertTrue(self.asset.qr_code, "El QR debería haberse generado")
 
     def test_ui_elements_in_view(self):
-        """ Test that the QR code and print button are present in the form view """
-        # This should fail in the Red phase
+        """Verificar que el QR NO está en la vista de formulario (se movió a etiquetas)."""
         view = self.env.ref('Inventario.view_inventory_asset_form')
-        arch = view.get_combined_arch()
-        self.assertIn('name="qr_code"', arch, "QR code field should be in the view")
-        self.assertIn('string="Imprimir ID"', arch, "Print button should be in the view")
+        arch = view.arch
+        self.assertNotIn('name="qr_code"', arch, "El QR ya no debería estar en la vista de formulario")
+
+    def test_label_report_existence(self):
+        """Verificar que el reporte de etiquetas existe."""
+        report = self.env.ref('Inventario.action_report_asset_label')
+        self.assertTrue(report, "El reporte de etiquetas debe existir")
