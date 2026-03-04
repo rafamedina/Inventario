@@ -10,10 +10,10 @@ Prepare the environment for the batch update.
 ## Phase 2: Dependency Upgrades
 Perform the batch update of the `requirements.txt` and virtual environment.
 
-- [ ] Task: Update `requirements.txt`
-    - [ ] Modify `requirements.txt` with the new versions for `gevent`, `pillow`, `reportlab`, `jinja2`, `urllib3`, and `cryptography`.
-- [ ] Task: Re-install Dependencies
-    - [ ] Run `/home/ikran/odooInventario17/.venv/bin/pip install -r /home/ikran/odooInventario17/requirements.txt`.
+- [x] Task: Update `requirements.txt` 94c1f55
+    - [x] Modify `requirements.txt` with the new versions for `gevent`, `pillow`, `reportlab`, `jinja2`, `urllib3`, and `cryptography`.
+- [x] Task: Re-install Dependencies 94c1f55
+    - [x] Run `/home/ikran/odooInventario17/.venv/bin/pip install -r /home/ikran/odooInventario17/requirements.txt`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Dependency Upgrades' (Protocol in workflow.md)
 
 ## Phase 3: Regression Testing
