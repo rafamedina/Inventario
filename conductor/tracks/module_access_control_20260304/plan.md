@@ -20,6 +20,8 @@ Restrict CRUD operations on models to the new security group.
     - [x] Replace `base.group_user` with `Inventario.group_inventory_manager` for all models in the CSV file.
 - [x] Task: TDD - Verify Granted Access (Success) 981589b
     - [x] Write a test where a user WITH the new group tries to perform CRUD operations on an asset. Confirm it succeeds.
+- [x] Task: Restrict Employee View Fields c732230
+    - [x] Update `view_employee_form_inventory_simple` in `views.xml` to restrict the "Activos Asignados" page to the `group_inventory_manager`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Apply Access Rights' (Protocol in workflow.md)
 
 ## Phase 3: Menu Restriction
