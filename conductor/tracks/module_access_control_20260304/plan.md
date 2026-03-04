@@ -33,11 +33,11 @@ Hide the module's root menu for unauthorized users.
     - [x] Write a test to check if the root menu is returned in the menu tree for a user in the group and not for a standard user.
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Menu Restriction' (Protocol in workflow.md)
 
-## Phase 4: Final Verification and Cleanup
+## Phase 4: Final Verification and Cleanup [checkpoint: df6ec98]
 Perform end-to-end checks and ensure consistency.
 
 - [x] Task: Full Test Suite Execution fd3ba98
     - [x] Run all module tests to ensure no regressions.
 - [x] Task: Documentation Update f3c0468
     - [x] (Optional) Add a brief note in a README or similar file about how to grant access.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Verification and Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Verification and Cleanup' (Protocol in workflow.md)
