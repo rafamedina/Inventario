@@ -19,8 +19,8 @@ Apply the constraints to the models.
     - [x] Override `unlink()` to check for related records and raise `UserError`.
 - [x] Task: Update `InventoryAsset` SQL Constraints 0eb33ef
     - [x] Add `_sql_constraints` for `identificador_final_unique`.
-- [~] Task: Secure Maintenance History
-    - [ ] Override `unlink()` in `inventory.asset.maintenance` to block deletion if `state == 'done'`.
+- [x] Task: Secure Maintenance History 235e33c
+    - [x] Override `unlink()` in `inventory.asset.maintenance` to block deletion if `state == 'done'`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Implementation of Logic' (Protocol in workflow.md)
 
 ## Phase 3: Verification
