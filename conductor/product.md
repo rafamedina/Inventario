@@ -24,5 +24,9 @@ Administra el inventario de activos de la compañia Wavext.
 - Detailed Maintenance History: Full historical record of all maintenance events accessible from the asset record.
 - Automated Label Printing: Support for printing standardized A4 labels containing asset IDs and scannable QR codes.
 
+## Security and Access Control
+- Module-Level Visibility: Access to the module is restricted to a specific security group.
+- Roles: "Inventory / Full Access" group grants full CRUD permissions and visibility of the module icon.
+
 ## Platform Context
 - Native Odoo Integration: Leveraging standard Odoo modules like HR and Mail.
