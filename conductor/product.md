@@ -19,6 +19,9 @@ Administra el inventario de activos de la compañia Wavext.
 - Bidirectional Traceability: Track assets from the employee record and employees from the asset record.
 - Historical Assignment Logs: Automatic recording of all owner and responsible changes.
 - QR Code Generation: Integrated QR codes on printed labels for quick identification and mobile interaction with the asset record.
+- Maintenance Checklists: Interactive task-based checklists for each maintenance event.
+- Evidence Tracking: Support for uploading images per checklist item as proof of maintenance work.
+- Detailed Maintenance History: Full historical record of all maintenance events accessible from the asset record.
 - Automated Label Printing: Support for printing standardized A4 labels containing asset IDs and scannable QR codes.
 
 ## Platform Context
