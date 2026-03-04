@@ -16,9 +16,9 @@ Restrict CRUD operations on models to the new security group.
 
 - [x] Task: TDD - Verify Restricted Access (Failure) 6baae43
     - [x] Write a test in `Inventario/tests/test_security_groups.py` where a standard internal user (without the new group) tries to read or create an asset. Confirm it fails as expected.
-- [~] Task: Update `ir.model.access.csv`
-    - [ ] Replace `base.group_user` with `Inventario.group_inventory_manager` for all models in the CSV file.
-- [ ] Task: TDD - Verify Granted Access (Success)
+- [x] Task: Update `ir.model.access.csv` 0fa6818
+    - [x] Replace `base.group_user` with `Inventario.group_inventory_manager` for all models in the CSV file.
+- [~] Task: TDD - Verify Granted Access (Success)
     - [ ] Write a test where a user WITH the new group tries to perform CRUD operations on an asset. Confirm it succeeds.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Apply Access Rights' (Protocol in workflow.md)
 
