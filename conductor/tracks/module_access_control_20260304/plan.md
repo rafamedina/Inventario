@@ -11,7 +11,7 @@ Create the foundational security group for managing access to the module.
     - [x] Write a test case in a new test file `Inventario/tests/test_security_groups.py` to ensure the group is correctly created in the database.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Define Security Group' (Protocol in workflow.md)
 
-## Phase 2: Apply Access Rights
+## Phase 2: Apply Access Rights [checkpoint: 16e1384]
 Restrict CRUD operations on models to the new security group.
 
 - [x] Task: TDD - Verify Restricted Access (Failure) 6baae43
@@ -22,14 +22,14 @@ Restrict CRUD operations on models to the new security group.
     - [x] Write a test where a user WITH the new group tries to perform CRUD operations on an asset. Confirm it succeeds.
 - [x] Task: Restrict Employee View Fields 600079b
     - [x] Update `view_employee_form_inventory_simple` in `views.xml` to restrict the "Activos Asignados" page to the `group_inventory_manager`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Apply Access Rights' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Apply Access Rights' (Protocol in workflow.md)
 
 ## Phase 3: Menu Restriction
 Hide the module's root menu for unauthorized users.
 
 - [x] Task: Update Menu Visibility d394169
     - [x] Edit `Inventario/views/views.xml` to add `groups="group_inventory_manager"` to the `menu_inventory_root` menuitem.
-- [ ] Task: TDD - Verify Menu Visibility
+- [~] Task: TDD - Verify Menu Visibility
     - [ ] Write a test to check if the root menu is returned in the menu tree for a user in the group and not for a standard user.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Menu Restriction' (Protocol in workflow.md)
 
