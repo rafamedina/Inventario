@@ -165,6 +165,10 @@ class InventoryAsset(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin'] 
     _rec_name = 'nombre'
 
+    _sql_constraints = [
+        ('identificador_final_unique', 'unique(identificador_final)', "⛔ El Identificador Estandarizado debe ser único para cada activo.")
+    ]
+
     active = fields.Boolean(string="Activo", default=True, tracking=True)
     nombre = fields.Char(string='Nombre', required=True, tracking=True)
     descripcion = fields.Text(string='Descripción')
