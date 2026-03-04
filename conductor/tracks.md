@@ -13,3 +13,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 *Link: [./tracks/asset_qr_label_20260227/](./tracks/asset_qr_label_20260227/)*
 
 
+
+---
+
+- [ ] **Track: Critical Dependency Security Updates**
+*Link: [./tracks/security_updates_20260304/](./tracks/security_updates_20260304/)*
