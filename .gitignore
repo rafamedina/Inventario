@@ -1,4 +1,8 @@
 .gemini/
 gha-creds-*.json
+<<<<<<< HEAD
 __pycache__/
 conductor/
+=======
+__pycache__/
+>>>>>>> 18.0-dev
