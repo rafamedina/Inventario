@@ -1,8 +1,0 @@
-{
-  "track_id": "asset_qr_label_20260227",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-02-27T11:20:00Z",
-  "updated_at": "2026-02-27T11:20:00Z",
-  "description": "Ahora vamos a implementar una funciona para que cada producto tenga un qr en la ficha que al escanearlo manda el panel de impresora para imprimir solo el id estandarizado, debajo del qe un mini boton que diga pulsa aqui para pc y ese hace lo mismo pero en formato de boton"
-}
