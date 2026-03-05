@@ -1,8 +1,0 @@
-{
-  "track_id": "subcategory_migration_fix_20260303",
-  "type": "bug",
-  "status": "new",
-  "created_at": "2026-03-03T10:00:00Z",
-  "updated_at": "2026-03-03T10:00:00Z",
-  "description": "Fix the subcategory migration issue where the category link is lost during export/import by making the field visible and exportable."
-}
