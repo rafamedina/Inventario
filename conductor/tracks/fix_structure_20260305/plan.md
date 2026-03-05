@@ -21,8 +21,8 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Project Structure and Import Resolution' (Protocol in workflow.md)
 
 ## Phase 3: Final Validation and Quality Gates
-- [ ] Task: Run the full suite of existing tests in the `tests/` directory and ensure they all pass.
-    - [ ] Execute `pytest` (or the project's chosen test runner) and confirm all tests are green.
-- [ ] Task: Perform a final review to ensure standard Odoo module structure and path conventions are followed.
-    - [ ] Verify that no stray folders or files from the previous structure remain.
+- [x] Task: Run the full suite of existing tests in the `tests/` directory and ensure they all pass.
+    - [x] Execute `pytest` (or the project's chosen test runner) and confirm all tests are green.
+- [x] Task: Perform a final review to ensure standard Odoo module structure and path conventions are followed.
+    - [x] Verify that no stray folders or files from the previous structure remain.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Final Validation and Quality Gates' (Protocol in workflow.md)
