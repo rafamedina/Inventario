@@ -9,7 +9,7 @@ python3 odoo-bin -r odoo -w odoo --db_host=localhost --addons-path=addons,module
 source venv/bin/activate
 
 
-
+hola
 
 
 # === EJECUCIÓN DE TESTS ===
