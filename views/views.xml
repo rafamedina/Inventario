@@ -8,11 +8,11 @@
         <field name="name">inventory.category.tree</field>
         <field name="model">inventory.category</field>
         <field name="arch" type="xml">
-            <tree string="Categorías">
+            <list string="Categorías">
                 <field name="codigo"/>
                 <field name="nombre"/>
                 <field name="descripcion"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_inventory_category_form" model="ir.ui.view">
@@ -40,12 +40,12 @@
         <field name="name">inventory.subcategory.tree</field>
         <field name="model">inventory.subcategory</field>
         <field name="arch" type="xml">
-            <tree string="Subcategorías">
+            <list string="Subcategorías">
                 <field name="categoria_id"/>
                 <field name="codigo"/>
                 <field name="nombre"/>
                 <field name="descripcion"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -92,11 +92,11 @@
         <field name="name">inventory.location.tree</field>
         <field name="model">inventory.location</field>
         <field name="arch" type="xml">
-            <tree string="Localizaciones">
+            <list string="Localizaciones">
                 <field name="codigo"/>
                 <field name="nombre"/>
                 <field name="descripcion"/>
-            </tree>
+            </list>
         </field>
     </record>
     <record id="view_inventory_location_form" model="ir.ui.view">
@@ -124,13 +124,13 @@
         <field name="name">inventory.asset.maintenance.tree</field>
         <field name="model">inventory.asset.maintenance</field>
         <field name="arch" type="xml">
-            <tree string="Mantenimientos" create="false">
+            <list string="Mantenimientos" create="false">
                 <field name="fecha_inicio"/>
                 <field name="fecha_fin"/>
                 <field name="asset_id"/>
                 <field name="plan_id"/>
                 <field name="state" widget="badge" decoration-success="state == 'done'" decoration-info="state == 'in_progress'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -159,11 +159,11 @@
                     <notebook>
                         <page string="Checklist de Seguimiento">
                             <field name="checklist_line_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="name" readonly="1"/>
                                     <field name="is_done" widget="boolean_toggle"/>
                                     <field name="image" widget="image" options="{'size': [90, 90]}"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -184,7 +184,7 @@
         <field name="name">inventory.asset.tree</field>
         <field name="model">inventory.asset</field>
         <field name="arch" type="xml">
-            <tree string="Inventario" decoration-danger="estado_mantenimiento == 'vencido'" decoration-warning="estado_mantenimiento == 'proximo'">
+            <list string="Inventario" decoration-danger="estado_mantenimiento == 'vencido'" decoration-warning="estado_mantenimiento == 'proximo'">
                 <field name="identificador_final" decoration-bf="1"/> 
                 <field name="nombre"/>
                 <field name="categoria_id"/> 
@@ -199,7 +199,7 @@
                        decoration-warning="estado_mantenimiento_proceso == 'en_proceso'" 
                        decoration-muted="estado_mantenimiento_proceso == 'no_iniciado'"/>
                 <field name="proximo_mantenimiento" widget="remaining_days"/>                
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -262,11 +262,11 @@
                             </group>
                             <separator string="Checklist de Tareas"/>
                             <field name="checklist_activo_ids" nolabel="1">
-                                <tree editable="bottom" create="false" delete="false">
+                                <list editable="bottom" create="false" delete="false">
                                     <field name="name" readonly="1"/>
                                     <field name="is_done" widget="boolean_toggle"/>
                                     <field name="image" widget="image" options="{'size': [90, 90]}"/>
-                                </tree>
+                                </list>
                             </field>
                             <p class="text-muted" invisible="not mantenimiento_activo_id">
                                 * Marca cada tarea como "Hecha" y sube una foto como evidencia del trabajo realizado.
@@ -291,12 +291,12 @@
                         <!-- NUEVA PESTAÑA: Historial de Mantenimientos con Checklist -->
                         <page string="Historial Mantenimientos" name="maintenance_history">
                             <field name="mantenimiento_history_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="fecha_inicio"/>
                                     <field name="fecha_fin"/>
                                     <field name="plan_id"/>
                                     <field name="state" widget="badge" decoration-success="state == 'done'"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
 
@@ -310,12 +310,12 @@
                         
                         <page string="Historial Asignaciones">
                             <field name="history_ids" readonly="1">
-                                <tree>
+                                <list>
                                     <field name="date"/>
                                     <field name="old_employee_id"/>
                                     <field name="new_employee_id"/>
                                     <field name="role"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         
@@ -364,18 +364,18 @@
                     <notebook>
                         <page string="Lista de Tareas (Checklist)">
                             <field name="tarea_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="name" string="Descripción de la tarea"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                         <page string="Alertas Previas (Notificaciones)">
                             <field name="alerta_ids">
-                                <tree editable="bottom">
+                                <list editable="bottom">
                                     <field name="valor" string="Avisar"/>
                                     <field name="unidad" string="Unidad de tiempo"/>
                                     <field name="name" column_invisible="True"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -388,13 +388,13 @@
         <field name="name">plans.asset.tree</field>
         <field name="model">plans.asset</field>
         <field name="arch" type="xml">
-            <tree string="Planes">
+            <list string="Planes">
                 <field name="identificador" decoration-bf="1"/>
                 <field name="nombre"/>
                 <field name="categoria_id"/>
                 <field name="subcategoria_id"/>
                 <field name="periodicidad"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -433,30 +433,30 @@
                         <page string="Activos Asignados (Inventario)" name="inventory_assets" groups="Inventario.group_inventory_manager">
                             <separator string="Responsabilidades Actuales" groups="Inventario.group_inventory_manager"/>
                             <field name="current_responsible_asset_ids" readonly="1" groups="Inventario.group_inventory_manager">
-                                <tree>
+                                <list>
                                     <field name="identificador_final"/>
                                     <field name="nombre"/>
                                     <field name="categoria_id"/>
                                     <field name="subcategoria_id"/>
-                                </tree>
+                                </list>
                             </field>
                             <separator string="Propiedades Actuales" groups="Inventario.group_inventory_manager"/>
                             <field name="current_owner_asset_ids" readonly="1" groups="Inventario.group_inventory_manager">
-                                <tree>
+                                <list>
                                     <field name="identificador_final"/>
                                     <field name="nombre"/>
                                     <field name="categoria_id"/>
                                     <field name="subcategoria_id"/>
-                                </tree>
+                                </list>
                             </field>
                             <separator string="Historial de Asignaciones (Pasadas y Presentes)" groups="Inventario.group_inventory_manager"/>
                             <field name="asset_history_ids" readonly="1" groups="Inventario.group_inventory_manager">
-                                <tree>
+                                <list>
                                     <field name="date"/>
                                     <field name="identificador_final" string="ID Activo"/>
                                     <field name="asset_id" string="Nombre" optional="hide"/>
                                     <field name="role"/>
-                                </tree>
+                                </list>
                             </field>
                         </page>
                     </notebook>
@@ -486,35 +486,35 @@
     <record id="action_inventory_asset" model="ir.actions.act_window">
         <field name="name">Inventario de Activos</field>
         <field name="res_model">inventory.asset</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <record id="action_plans_asset" model="ir.actions.act_window">
         <field name="name">Planes de Mantenimiento</field>
         <field name="res_model" >plans.asset</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     
     <record id="action_inventory_category" model="ir.actions.act_window">
         <field name="name">Categorías</field>
         <field name="res_model">inventory.category</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <record id="action_inventory_subcategory" model="ir.actions.act_window">
         <field name="name">Subcategorías</field>
         <field name="res_model">inventory.subcategory</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <record id="action_inventory_location" model="ir.actions.act_window">
         <field name="name">Localizaciones</field>
         <field name="res_model">inventory.location</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- Acción para Empleados: Forzamos el uso de las vistas estándar para kanban/lista y la simplificada para el formulario -->
     <record id="action_inventory_employee" model="ir.actions.act_window">
         <field name="name">Empleados</field>
         <field name="res_model">hr.employee</field>
-        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_mode">kanban,list,form</field>
         <field name="context">{'search_default_has_responsible_assets': 1}</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
@@ -533,7 +533,7 @@
 
     <record id="action_inventory_employee_view_tree" model="ir.actions.act_window.view">
         <field name="sequence" eval="2"/>
-        <field name="view_mode">tree</field>
+        <field name="view_mode">list</field>
         <field name="view_id" ref="hr.view_employee_tree"/>
         <field name="act_window_id" ref="action_inventory_employee"/>
     </record>
