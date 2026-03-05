@@ -17,15 +17,15 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','mail','hr'],
+    'depends': ['base','mail','hr','inventario'],
 
     # always loaded
     'data': [
         'security/security_groups.xml',
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
-        'views/views.xml',
         'views/templates.xml',
+        'views/views.xml',
         'views/cron.xml',
     ],
     # only loaded in demonstration mode
