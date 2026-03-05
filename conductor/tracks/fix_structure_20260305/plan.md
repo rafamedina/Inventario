@@ -10,14 +10,14 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Project Audit and Test Creation' (Protocol in workflow.md)
 
 ## Phase 2: Project Structure and Import Resolution (Green Phase)
-- [ ] Task: Correct file paths in `__manifest__.py` (data, demo, assets).
-    - [ ] Update all listed file paths to be relative to the new module root.
-- [ ] Task: Fix the root `__init__.py` and all subdirectory `__init__.py` files (e.g., `models/__init__.py`, `controllers/__init__.py`).
-    - [ ] Correct import statements to reflect the new directory structure.
-- [ ] Task: Identify and fix any relative imports in the Python files themselves.
-    - [ ] Search for broken relative imports across the codebase and apply fixes.
-- [ ] Task: Verify that the previously created tests now pass.
-    - [ ] Run the reproduction script and confirm it now succeeds.
+- [x] Task: Correct file paths in `__manifest__.py` (data, demo, assets).
+    - [x] Update all listed file paths to be relative to the new module root.
+- [x] Task: Fix the root `__init__.py` and all subdirectory `__init__.py` files (e.g., `models/__init__.py`, `controllers/__init__.py`).
+    - [x] Correct import statements to reflect the new directory structure.
+- [x] Task: Identify and fix any relative imports in the Python files themselves.
+    - [x] Search for broken relative imports across the codebase and apply fixes.
+- [x] Task: Verify that the previously created tests now pass.
+    - [x] Run the reproduction script and confirm it now succeeds.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Project Structure and Import Resolution' (Protocol in workflow.md)
 
 ## Phase 3: Final Validation and Quality Gates
