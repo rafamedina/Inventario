@@ -7,5 +7,5 @@
 
 ---
 
-- [~] **Track: Fix visual misalignment in maintenance history**
+- [x] **Track: Fix visual misalignment in maintenance history**
 *Link: [./tracks/fix_maintenance_misalignment_20260306/](./tracks/fix_maintenance_misalignment_20260306/)*
