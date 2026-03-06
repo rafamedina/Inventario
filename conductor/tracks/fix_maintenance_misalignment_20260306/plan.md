@@ -1,6 +1,6 @@
 # Implementation Plan - Fix visual misalignment in maintenance history
 
-## Phase 1: Research & Reproduction
+## Phase 1: Research & Reproduction [checkpoint: fde9074]
 - [x] Task: Research Odoo 18 `list` view constraints and widget options for `fields.Text` inside a Many2one/One2many list. 4a2b1c3
 - [x] Task: Create a failing test case (if applicable for UI) or a reproduction scenario description to identify the misalignment's root cause. 8d9e0f1 (Findings: Split view is likely due to Odoo 18 default O2M list rendering in certain contexts or missing widget spec).
 - [x] Task: Conductor - User Manual Verification 'Research & Reproduction' (Protocol in workflow.md) 7f1e2d3
