@@ -161,6 +161,7 @@ class InventoryAssetMaintenanceLine(models.Model):
     name = fields.Char(string="Tarea", required=True)
     is_done = fields.Boolean(string="Hecho", default=False)
     image = fields.Binary(string="Imagen / Evidencia")
+    notes = fields.Text(string="Notas adicionales")
 
 # ==========================================
 # EL ACTIVO (InventoryAsset)
@@ -390,7 +391,7 @@ class InventoryAsset(models.Model):
         """
         for asset in self:
             if not asset.plan_id:
-                raise UserError("⛔ Selecciona primero un plan de mantenimiento para este activo.")
+                raise UserError("Selecciona primero un plan de mantenimiento para este activo.")
             
             if asset.mantenimiento_activo_id:
                 raise UserError("⚠️ Ya hay un mantenimiento en proceso para este activo.")
