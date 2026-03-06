@@ -22,28 +22,28 @@
             <t t-call="web.basic_layout">
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
-                        <!-- Bloque de la etiqueta con tamaño fijo (ej. 100x40mm) para asegurar espacio -->
                         <div style="width: 100mm; height: 40mm; border: 1px dashed #ccc; padding: 5mm; margin-bottom: 10px;">
-                            <table style="width: 100%; border-collapse: collapse;">
-                                <tr>
-                                    <td style="vertical-align: middle; width: 50%;">
+                            
+                            <table style="width: 100%; border-collapse: collapse; border: 0 !important;">
+                                <tr style="border: 0 !important;">
+                                    <td style="vertical-align: middle; width: 60%; border: 0 !important; padding: 5px;">
                                         <div style="font-family: 'Arial', sans-serif; font-size: 14px; font-weight: bold; line-height: 1.2;">
                                             <span t-field="o.identificador_final"/>
                                         </div>
                                     </td>
-                                    <td style="vertical-align: middle; width: 50%; text-align: right;">
-                                        <!-- QR Code usando el campo binario calculado -->
-                                        <img t-if="o.qr_code" t-att-src="image_data_uri(o.qr_code)" style="max-width: 30mm; max-height: 30mm; display: block; margin-left: auto;"/>
+                                    <td style="vertical-align: middle; width: 40%; text-align: right; border: 0 !important;">
+                                        <img t-if="o.qr_code" 
+                                            t-att-src="image_data_uri(o.qr_code)" 
+                                            style="max-width: 30mm; max-height: 30mm; display: block; margin-left: auto;"/>
                                     </td>
                                 </tr>
                             </table>
+
                         </div>
-                        <p style="font-size: 10px; color: #666; margin-top: 5px;">Recorte por la línea punteada para obtener su etiqueta.</p>
                     </div>
                 </t>
             </t>
         </template>
-
         <!-- Plantilla de Vista Previa HTML (Para Escaneo de QR) -->
         <template id="asset_label_preview_template" name="Vista Previa de Etiqueta">
             <html>

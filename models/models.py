@@ -1,5 +1,5 @@
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from datetime import timedelta, date
 import qrcode
 import base64
@@ -36,6 +36,25 @@ class InventorySubcategory(models.Model):
     codigo = fields.Char(string='Código', required=True, help="Ej: SRV, LAP, NVG...")
     descripcion = fields.Text(string='Descripción')
     categoria_id = fields.Many2one('inventory.category', string='Categoría', required=True, ondelete='cascade')
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if not vals.get('categoria_id'):
+                raise ValidationError("La subcategoría debe estar vinculada a una categoría.")
+        return super(InventorySubcategory, self).create(vals_list)
+
+    def write(self, vals):
+        if 'categoria_id' in vals and not vals.get('categoria_id'):
+            raise ValidationError("La subcategoría debe estar vinculada a una categoría.")
+        return super(InventorySubcategory, self).write(vals)
+
+    @api.constrains('categoria_id')
+    def _check_categoria_id(self):
+        for record in self:
+            if not record.categoria_id:
+                raise ValidationError("La subcategoría debe estar vinculada a una categoría.")
+
 
 class InventoryLocation(models.Model):
     _name = 'inventory.location'
@@ -172,9 +191,16 @@ class InventoryAsset(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin'] 
     _rec_name = 'nombre'
 
-    _sql_constraints = [
-        ('identificador_final_unique', 'unique(identificador_final)', "El Identificador Estandarizado debe ser único para cada activo.")
-    ]
+    @api.constrains('identificador_final')
+    def _check_identificador_final_unique(self):
+        for record in self:
+            if record.identificador_final:
+                duplicate = self.search([
+                    ('identificador_final', '=', record.identificador_final),
+                    ('id', '!=', record.id)
+                ], limit=1)
+                if duplicate:
+                    raise ValidationError(f"El Identificador Estandarizado '{record.identificador_final}' ya está en uso por otro activo.")
 
     active = fields.Boolean(string="Activo", default=True, tracking=True)
     nombre = fields.Char(string='Nombre', required=True, tracking=True)
@@ -477,6 +503,15 @@ class InventoryAsset(models.Model):
         for vals in vals_list:
             if vals.get('uuid_activo', 'Nuevo') == 'Nuevo':
                 vals['uuid_activo'] = self.env['ir.sequence'].next_by_code('inventory.asset.sequence') or 'Nuevo'
+            
+            # Manual unique check before hitting the database
+            # We must compute the identifier first if it's based on values in vals
+            # For simplicity, we can just rely on the fact that if we are providing
+            # a uuid_activo and anio_inclusion that already exists, it will fail.
+            if 'identificador_final' in vals:
+                 duplicate = self.search([('identificador_final', '=', vals['identificador_final'])], limit=1)
+                 if duplicate:
+                     raise ValidationError(f"El Identificador Estandarizado '{vals['identificador_final']}' ya está en uso.")
                 
         records = super(InventoryAsset, self).create(vals_list)
         for record in records:
@@ -592,3 +627,19 @@ class HrEmployee(models.Model):
         for employee in self:
             assets = employee.asset_history_ids.mapped('asset_id')
             employee.historical_asset_ids = assets
+
+    @api.model
+    def _get_private_fields(self):
+        """ 
+        Agregamos nuestros campos personalizados a la lista de campos privados
+        para evitar que Odoo lance un AccessError al intentar leerlos desde
+        perfiles públicos si no se tiene el permiso adecuado.
+        """
+        res = super(HrEmployee, self)._get_private_fields()
+        res.extend([
+            'current_responsible_asset_ids',
+            'current_owner_asset_ids',
+            'asset_history_ids',
+            'historical_asset_ids'
+        ])
+        return res

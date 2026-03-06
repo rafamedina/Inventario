@@ -15,6 +15,8 @@ hola
 # === EJECUCIÓN DE TESTS ===
 # Este comando ejecuta los tests del módulo y se detiene al terminar.
 # Sintaxis:
+docker-compose exec web odoo -d postgres -i nombre_de_tu_modulo --test-enable --stop-after-init
+
 python3 odoo-bin -r odoo -w odoo --db_host=localhost --addons-path=addons,module -d odoo --test-enable --stop-after-init -i Inventario
 
 # Significado:
