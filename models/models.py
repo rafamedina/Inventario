@@ -23,7 +23,7 @@ class InventoryCategory(models.Model):
             # Verificar si hay activos vinculados a esta categoría
             assets = self.env['inventory.asset'].search([('categoria_id', '=', record.id)], limit=1)
             if assets:
-                raise UserError(f"⛔ No puedes eliminar la categoría '{record.nombre}' porque tiene activos asociados.")
+                raise UserError(f"No puedes eliminar la categoría '{record.nombre}' porque tiene activos asociados.")
         return super(InventoryCategory, self).unlink()
 
 class InventorySubcategory(models.Model):
@@ -52,7 +52,7 @@ class InventoryLocation(models.Model):
             # Verificar si hay activos vinculados a esta ubicación
             assets = self.env['inventory.asset'].search([('ubicacion_id', '=', record.id)], limit=1)
             if assets:
-                raise UserError(f"⛔ No puedes eliminar la localización '{record.nombre}' porque tiene activos asociados.")
+                raise UserError(f"No puedes eliminar la localización '{record.nombre}' porque tiene activos asociados.")
         return super(InventoryLocation, self).unlink()
 
 
@@ -150,7 +150,7 @@ class InventoryAssetMaintenance(models.Model):
     def unlink(self):
         for record in self:
             if record.state == 'done' and not self.env.user.has_group('base.group_erp_manager'):
-                raise UserError("⛔ No puedes eliminar un registro de mantenimiento que ya ha sido finalizado. Contacta con tu administrador.")
+                raise UserError("No puedes eliminar un registro de mantenimiento que ya ha sido finalizado. Contacta con tu administrador.")
         return super(InventoryAssetMaintenance, self).unlink()
 
 class InventoryAssetMaintenanceLine(models.Model):
@@ -172,7 +172,7 @@ class InventoryAsset(models.Model):
     _rec_name = 'nombre'
 
     _sql_constraints = [
-        ('identificador_final_unique', 'unique(identificador_final)', "⛔ El Identificador Estandarizado debe ser único para cada activo.")
+        ('identificador_final_unique', 'unique(identificador_final)', "El Identificador Estandarizado debe ser único para cada activo.")
     ]
 
     active = fields.Boolean(string="Activo", default=True, tracking=True)
