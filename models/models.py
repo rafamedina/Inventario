@@ -161,7 +161,7 @@ class InventoryAssetMaintenanceLine(models.Model):
     name = fields.Char(string="Tarea", required=True)
     is_done = fields.Boolean(string="Hecho", default=False)
     image = fields.Binary(string="Imagen / Evidencia")
-    notes = fields.Text(string="Notas adicionales")
+    notes = fields.Char(string="Notas adicionales")
 
 # ==========================================
 # EL ACTIVO (InventoryAsset)
