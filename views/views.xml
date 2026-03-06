@@ -211,9 +211,6 @@
                     <button name="action_finish_maintenance" string="Finalizar Mantenimiento" type="object" class="oe_highlight" 
                             invisible="estado_mantenimiento_proceso != 'en_proceso'"/>
                     
-                    <button name="action_maintenance_done" string="Registrar Manual (Sin checklist)" type="object" 
-                            invisible="estado_mantenimiento_proceso == 'en_proceso'"/>
-                    
                     <button name="%(action_report_asset_label)d" string="Imprimir ID" type="action" class="oe_highlight"/>
                     
                     <field name="estado_mantenimiento_proceso" widget="statusbar" statusbar_visible="no_iniciado,en_proceso,realizado"/>
