@@ -12,5 +12,5 @@
 - [x] Task: Conductor - User Manual Verification 'UI Fix Implementation' (Protocol in workflow.md) a1b2c3d
 
 ## Phase 3: Finalization & Documentation
-- [ ] Task: Run project linters and ensure code style adherence.
-- [ ] Task: Conductor - User Manual Verification 'Finalization & Documentation' (Protocol in workflow.md)
+- [x] Task: Run project linters and ensure code style adherence. 01cb85b (Manual review performed as ruff is not installed).
+- [~] Task: Conductor - User Manual Verification 'Finalization & Documentation' (Protocol in workflow.md)
