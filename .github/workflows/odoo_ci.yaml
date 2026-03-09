@@ -49,10 +49,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Image (using cache)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: inventario:latest
+          cache-from: type=gha
       - name: Run Unit Tests
         run: |
           echo "🚀 Starting Unit Tests..."
-          # Usamos tee para ver la salida en vivo y guardarla en el log
           docker run inventario:latest pytest tests -m unit -v --tb=short --color=yes 2>&1 | tee /tmp/odoo_tests.log || true
 
       - name: Analyze Results
@@ -64,21 +72,9 @@ jobs:
           echo "           UNIT TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
-          
-          # Extraer el resumen final de pytest
           SUMMARY=$(grep -E "==.*passed.*==" "$LOG" | tail -1)
-          if [ -n "$SUMMARY" ]; then
-            echo "📊 $SUMMARY"
-          else
-            echo "📊 No summary line found. Check logs above."
-          fi
-          
-          if grep -q "FAILED" "$LOG"; then
-            echo "❌ FAILED TESTS DETECTED. See tracebacks above."
-            exit 1
-          else
-            echo "✅ All unit tests passed successfully."
-          fi
+          if [ -n "$SUMMARY" ]; then echo "📊 $SUMMARY"; else echo "📊 No summary line found."; fi
+          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ All unit tests passed."; fi
 
       - name: Upload Logs
         if: always()
@@ -94,6 +90,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Image (using cache)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          load: true
+          tags: inventario:latest
+          cache-from: type=gha
       - name: Run Integration Tests
         run: |
           echo "🚀 Starting Integration Tests..."
@@ -108,18 +113,9 @@ jobs:
           echo "         INTEGRATION TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
-          
           SUMMARY=$(grep -E "==.*passed.*==" "$LOG" | tail -1)
-          if [ -n "$SUMMARY" ]; then
-            echo "📊 $SUMMARY"
-          fi
-          
-          if grep -q "FAILED" "$LOG"; then
-            echo "❌ FAILED TESTS DETECTED. See tracebacks above."
-            exit 1
-          else
-            echo "✅ All integration tests passed successfully."
-          fi
+          if [ -n "$SUMMARY" ]; then echo "📊 $SUMMARY"; fi
+          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ All integration tests passed."; fi
 
       - name: Upload Logs
         if: always()
