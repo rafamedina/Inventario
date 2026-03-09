@@ -1,10 +1,9 @@
 from datetime import date
 
-import pytest
 from odoo.tests import common
 
 
-@pytest.mark.integration
+
 class TestMaintenanceChecklists(common.TransactionCase):
     def setUp(self):
         super(TestMaintenanceChecklists, self).setUp()

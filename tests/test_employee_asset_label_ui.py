@@ -1,8 +1,8 @@
-import pytest
-from odoo.tests import common
+
+from odoo.tests import common, tagged
 
 
-@pytest.mark.integration
+@tagged("post_install", "-at_install", "ui")
 class TestEmployeeAssetLabelUI(common.TransactionCase):
     def test_employee_form_contains_asset_smart_button(self):
         """Test that the hr.employee form view has been extended with the asset smart button"""

@@ -1,8 +1,8 @@
-import pytest
-from odoo.tests import common
+
+from odoo.tests import common, tagged
 
 
-@pytest.mark.integration
+@tagged("post_install", "-at_install", "ui")
 class TestEmployeeHistoryUI(common.TransactionCase):
     def setUp(self):
         super(TestEmployeeHistoryUI, self).setUp()

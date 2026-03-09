@@ -1,8 +1,5 @@
-import pytest
 from odoo.tests.common import TransactionCase
 
-
-@pytest.mark.unit
 class TestAssetQR(TransactionCase):
     def setUp(self):
         super(TestAssetQR, self).setUp()

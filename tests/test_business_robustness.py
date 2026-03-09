@@ -1,9 +1,7 @@
-import pytest
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests.common import TransactionCase
 
 
-@pytest.mark.integration
 class TestBusinessRobustness(TransactionCase):
     def setUp(self):
         super(TestBusinessRobustness, self).setUp()

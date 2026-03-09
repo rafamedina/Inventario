@@ -1,8 +1,7 @@
-import pytest
 from odoo.tests import common
 
 
-@pytest.mark.integration
+
 class TestAssetTraceability(common.TransactionCase):
     def setUp(self):
         super(TestAssetTraceability, self).setUp()

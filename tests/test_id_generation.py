@@ -1,8 +1,7 @@
-import pytest
+
 from odoo.tests import common
 
 
-@pytest.mark.unit
 class TestIDGeneration(common.TransactionCase):
     def setUp(self):
         super(TestIDGeneration, self).setUp()

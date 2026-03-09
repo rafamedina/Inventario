@@ -107,7 +107,7 @@ jobs:
               --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
               -d ${{ env.ODOO_DB }}_unit \
               -i Inventario \
-              --test-tags=/Inventario,-/Inventario:TestUiPortal \
+              --test-tags=/Inventario,-ui \
               --log-level=test \
               -c /dev/null \
             2>&1 | tee /tmp/odoo_unit_tests.log
@@ -182,7 +182,7 @@ jobs:
               --db_password=${{ env.POSTGRES_PASSWORD }} \
               -d ${{ env.ODOO_DB }}_int \
               -i Inventario \
-              --test-tags=/Inventario:TestUiPortal \
+              --test-tags=ui \
               --log-level=test \
               -c /dev/null \
             2>&1 | tee /tmp/odoo_int_tests.log

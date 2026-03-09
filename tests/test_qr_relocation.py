@@ -1,8 +1,7 @@
-import pytest
+
 from odoo.tests import common, tagged
 
 
-@pytest.mark.unit
 @tagged("post_install", "-at_install", "test_qr_relocation")
 class TestQRRelocation(common.TransactionCase):
     def test_qr_code_removed_from_form_header(self):
