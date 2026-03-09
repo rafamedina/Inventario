@@ -621,6 +621,28 @@ class HrEmployee(models.Model):
         compute="_compute_historical_assets"
     )
 
+    asset_count = fields.Integer(string="Cantidad de Activos", compute="_compute_asset_count")
+
+    @api.depends('current_responsible_asset_ids', 'current_owner_asset_ids')
+    def _compute_asset_count(self):
+        for employee in self:
+            # Contamos activos únicos donde es responsable o propietario
+            assets = employee.current_responsible_asset_ids | employee.current_owner_asset_ids
+            employee.asset_count = len(assets)
+
+    def action_view_employee_assets(self):
+        """ 
+        Acción para el Smart Button: redirige a la vista de activos del empleado.
+        Usamos la acción personalizada que ya existe pero filtrando por el empleado.
+        """
+        self.ensure_one()
+        action = self.env.ref('Inventario.action_inventory_employee').read()[0]
+        # Forzamos que abra este empleado específico en modo formulario
+        action['res_id'] = self.id
+        action['view_mode'] = 'form'
+        action['views'] = [(self.env.ref('Inventario.view_employee_form_inventory_simple').id, 'form')]
+        return action
+
     @api.depends('asset_history_ids')
     def _compute_historical_assets(self):
         """ Calcula los activos únicos que han estado vinculados al empleado """

@@ -27,6 +27,7 @@ Long description of module's purpose
         'views/templates.xml',
         'views/views.xml',
         'views/cron.xml',
+        'views/employee_view_extension.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

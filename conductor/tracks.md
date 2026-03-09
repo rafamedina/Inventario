@@ -7,5 +7,5 @@
 
 ---
 
-- [ ] **Track: Employee Asset Label Button**
+- [x] **Track: Employee Asset Label Button**
 *Link: [./tracks/employee_asset_label_button_20260309/](./tracks/employee_asset_label_button_20260309/)*

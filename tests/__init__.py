@@ -9,3 +9,4 @@ from . import test_employee_history_ui
 from . import test_qr_relocation
 from . import test_security_groups
 from . import test_business_robustness
+from . import test_employee_asset_label_ui
