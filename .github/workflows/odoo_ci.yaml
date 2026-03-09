@@ -51,24 +51,33 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Unit Tests
         run: |
-          echo "🚀 Running Unit Tests..."
-          docker run inventario:latest pytest tests -m unit -v --tb=short > /tmp/odoo_tests.log 2>&1 || true
+          echo "🚀 Starting Unit Tests..."
+          # Usamos tee para ver la salida en vivo y guardarla en el log
+          docker run inventario:latest pytest tests -m unit -v --tb=short --color=yes 2>&1 | tee /tmp/odoo_tests.log || true
 
       - name: Analyze Results
         if: always()
         run: |
           LOG="/tmp/odoo_tests.log"
+          echo ""
           echo "═══════════════════════════════════════════════"
-          echo "           UNIT TESTS ANALYSIS"
+          echo "           UNIT TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
-          grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary line found"
+          
+          # Extraer el resumen final de pytest
+          SUMMARY=$(grep -E "==.*passed.*==" "$LOG" | tail -1)
+          if [ -n "$SUMMARY" ]; then
+            echo "📊 $SUMMARY"
+          else
+            echo "📊 No summary line found. Check logs above."
+          fi
+          
           if grep -q "FAILED" "$LOG"; then
-            echo "❌ FAILED TESTS DETECTED:"
-            grep -P "FAILED tests/test_.*" "$LOG" || true
+            echo "❌ FAILED TESTS DETECTED. See tracebacks above."
             exit 1
           else
-            echo "✅ All unit tests passed."
+            echo "✅ All unit tests passed successfully."
           fi
 
       - name: Upload Logs
@@ -87,24 +96,29 @@ jobs:
         uses: actions/checkout@v4
       - name: Run Integration Tests
         run: |
-          echo "🚀 Running Integration Tests..."
-          docker run inventario:latest pytest tests -m integration -v --tb=short > /tmp/odoo_tests.log 2>&1 || true
+          echo "🚀 Starting Integration Tests..."
+          docker run inventario:latest pytest tests -m integration -v --tb=short --color=yes 2>&1 | tee /tmp/odoo_tests.log || true
 
       - name: Analyze Results
         if: always()
         run: |
           LOG="/tmp/odoo_tests.log"
+          echo ""
           echo "═══════════════════════════════════════════════"
-          echo "         INTEGRATION TESTS ANALYSIS"
+          echo "         INTEGRATION TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
-          grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary line found"
+          
+          SUMMARY=$(grep -E "==.*passed.*==" "$LOG" | tail -1)
+          if [ -n "$SUMMARY" ]; then
+            echo "📊 $SUMMARY"
+          fi
+          
           if grep -q "FAILED" "$LOG"; then
-            echo "❌ FAILED TESTS DETECTED:"
-            grep -P "FAILED tests/test_.*" "$LOG" || true
+            echo "❌ FAILED TESTS DETECTED. See tracebacks above."
             exit 1
           else
-            echo "✅ All integration tests passed."
+            echo "✅ All integration tests passed successfully."
           fi
 
       - name: Upload Logs
@@ -124,33 +138,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
       - name: Checkout or Create Pre-Prod branch
-        run: |
-          git checkout 18.0-pre-prod || git checkout -b 18.0-pre-prod
-
+        run: git checkout 18.0-pre-prod || git checkout -b 18.0-pre-prod
       - name: Merge Development into Pre-Prod
         run: |
-          # Usamos estrategia 'theirs' para que los cambios de dev siempre ganen en conflictos
           git merge origin/${{ github.ref_name }} --no-ff -X theirs -m "chore: auto-merge dev to pre-prod after tests [skip ci]"
-
       - name: Clean up Non-App files
         run: |
-          # Borramos lo innecesario para producción
           rm -rf tests/ conductor/ .github/
           rm -f .pre-commit-config.yaml .ruff_cache/ Dockerfile pytest.ini comando.md pyproject.toml .gitignore
-          
-          # Realizamos commit de la limpieza
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: cleanup non-app files for pre-prod [skip ci]"
           fi
-
       - name: Push to Pre-Prod
-        run: |
-          git push origin 18.0-pre-prod
+        run: git push origin 18.0-pre-prod
