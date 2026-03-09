@@ -14,3 +14,4 @@
 - **HR Skills Module:** Standard Odoo module for employee skills and reports.
 - **Mail Module:** Standard Odoo module for internal communication and messaging.
 - **Base Module:** Core Odoo framework functionality.
+- **Python Libraries:** `qrcode`, `base64`, `io` (for asset label generation).

@@ -12,6 +12,7 @@ To provide a secure and centralized system for managing the lifecycle of company
 
 ## Key Features
 - **Asset Lifecycle Tracking:** Monitor assets from acquisition through their functional lifespan until disposal.
+- **Employee-Asset Integration:** Direct access to assigned assets from the Odoo Employee profile via smart buttons.
 - **Maintenance Scheduling:** Plan and record maintenance history for IT Hardware and Office Furniture.
 - **Role-Based Access Control:** Strict enforcement of visibility and management rights based on Odoo security groups.
 
