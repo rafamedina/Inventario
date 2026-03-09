@@ -2,9 +2,12 @@ name: Odoo Module CI
 
 on:
   push:
-    branches: ["18.0-dev", "master"]
+    branches: [ "18.0-dev", "master" ]
   pull_request:
-    branches: ["18.0-dev", "master"]
+    branches: [ "18.0-dev", "master" ]
+
+permissions:
+  contents: write # Permiso para que el runner pueda pushear el merge
 
 jobs:
   lint:
@@ -28,10 +31,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Build and Load Image
         uses: docker/build-push-action@v5
         with:
@@ -41,11 +42,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Guardamos la imagen como un artefacto si queremos reutilizarla en otros jobs sin reconstruir,
-      # aunque en un flujo real con Registry se haría un push.
-      # Para GitHub Actions gratuito, reconstruir con cache es a veces más rápido que descargar 1GB.
-      # Pero aquí el usuario pidió "una vez creada... en otro job", así que asumiremos reconstrucción rápida por cache.
-
   unit-tests:
     name: Unit Tests
     needs: build
@@ -53,10 +49,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Build and cache (fast)
         uses: docker/build-push-action@v5
         with:
@@ -64,12 +58,9 @@ jobs:
           load: true
           tags: inventario:latest
           cache-from: type=gha
-
       - name: Run Unit Tests
         run: |
-          # El usuario debe marcar sus tests de unidad con @pytest.mark.unit o filtrar por ruta.
-          # Por ahora corremos pytest filtrando por los archivos que no son de UI si es posible, o usamos el marcador.
-          docker run inventario:latest pytest tests -m unit || echo "Aviso: No se encontraron tests con el marcador 'unit'."
+          docker run inventario:latest pytest tests -m unit || echo "Aviso: No se encontraron tests unitarios."
 
   integration-tests:
     name: Integration Tests
@@ -78,10 +69,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Build and cache (fast)
         uses: docker/build-push-action@v5
         with:
@@ -89,8 +78,56 @@ jobs:
           load: true
           tags: inventario:latest
           cache-from: type=gha
-
       - name: Run Integration Tests
         run: |
-          # El usuario debe marcar sus tests de integración con @pytest.mark.integration
-          docker run inventario:latest pytest tests -m integration || echo "Aviso: No se encontraron tests con el marcador 'integration'."
+          docker run inventario:latest pytest tests -m integration || echo "Aviso: No se encontraron tests de integración."
+
+  promote-to-preprod:
+    name: Merge and Cleanup for Pre-Prod
+    needs: [unit-tests, integration-tests]
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source Branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Necesario para tener el historial de ramas
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Checkout or Create Pre-Prod branch
+        run: |
+          git checkout 18.0-pre-prod || git checkout -b 18.0-pre-prod
+
+      - name: Merge Development into Pre-Prod
+        run: |
+          # Usamos estrategia 'recursive' y 'theirs' para priorizar el dev ante conflictos
+          git merge ${{ github.ref_name }} --no-ff -m "chore: auto-merge dev to pre-prod after tests [skip ci]"
+
+      - name: Clean up Non-App files
+        run: |
+          # Eliminar carpetas y archivos innecesarios
+          rm -rf tests/
+          rm -rf conductor/
+          rm -rf .github/
+          rm -f .pre-commit-config.yaml
+          rm -f .ruff_cache/
+          rm -f Dockerfile
+          rm -f pytest.ini
+          rm -f comando.md
+          rm -f pyproject.toml
+          
+          # Verificar si hay cambios antes de commitear
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "chore: cleanup non-app files for pre-prod [skip ci]"
+          else
+            echo "No changes to clean up."
+          fi
+
+      - name: Push to Pre-Prod
+        run: |
+          git push origin 18.0-pre-prod
