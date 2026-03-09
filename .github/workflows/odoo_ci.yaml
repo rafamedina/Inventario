@@ -119,8 +119,10 @@ jobs:
           echo "═══════════════════════════════════════════════"
           LOG="/tmp/odoo_unit_tests.log"
           EXIT_CODE=0
+          # 1. Extraer resumen
           TOTAL_LINE=$(grep -oP "\d+ failed, \d+ error\(s\) of \d+ tests" "$LOG" | tail -1)
           if [ -n "$TOTAL_LINE" ]; then echo "📊 Test Summary: $TOTAL_LINE"; fi
+          # 2. Detectar fallos
           FAIL_LINES=$(grep -P "(FAIL|ERROR): Test|ERROR: setUpClass" "$LOG" || true)
           if [ -n "$FAIL_LINES" ]; then
             echo "❌ DETECTED:"; echo "$FAIL_LINES" | grep -oP "(FAIL|ERROR): \S+" | sort -u
@@ -128,6 +130,7 @@ jobs:
           else
             echo "✅ All tests passed."
           fi
+          # 3. Validar logs por errores críticos
           ERROR_COUNT=$(grep -c " ERROR " "$LOG" 2>/dev/null) || ERROR_COUNT=0
           if [ "$ERROR_COUNT" -gt 0 ]; then echo "⚠️ ERROR entries: $ERROR_COUNT"; EXIT_CODE=1; fi
           exit $EXIT_CODE
@@ -194,10 +197,21 @@ jobs:
           echo "═══════════════════════════════════════════════"
           LOG="/tmp/odoo_int_tests.log"
           EXIT_CODE=0
+          # 1. Extraer resumen
+          TOTAL_LINE=$(grep -oP "\d+ failed, \d+ error\(s\) of \d+ tests" "$LOG" | tail -1)
+          if [ -n "$TOTAL_LINE" ]; then echo "📊 Test Summary: $TOTAL_LINE"; fi
+          # 2. Detectar fallos en tests y tours
           FAIL_LINES=$(grep -P "(FAIL|ERROR): Test|ERROR: setUpClass" "$LOG" || true)
           if [ -n "$FAIL_LINES" ]; then echo "❌ DETECTED:"; echo "$FAIL_LINES"; EXIT_CODE=1; fi
           TOUR_FAILS=$(grep "FAILED:" "$LOG" || true)
           if [ -n "$TOUR_FAILS" ]; then echo "❌ TOUR FAILURES:"; echo "$TOUR_FAILS"; EXIT_CODE=1; fi
+          # 3. Mostrar éxito si no hay fallos
+          if [ -z "$FAIL_LINES" ] && [ -z "$TOUR_FAILS" ]; then
+            echo "✅ All integration tests and tours passed."
+          fi
+          # 4. Validar logs
+          ERROR_COUNT=$(grep -c " ERROR " "$LOG" 2>/dev/null) || ERROR_COUNT=0
+          if [ "$ERROR_COUNT" -gt 0 ]; then echo "⚠️ ERROR entries: $ERROR_COUNT"; EXIT_CODE=1; fi
           exit $EXIT_CODE
       - name: Upload Test Logs
         if: always()
