@@ -11,5 +11,6 @@
 
 ## Key Libraries & Dependencies
 - **HR Module:** Standard Odoo module for employee management.
+- **HR Skills Module:** Standard Odoo module for employee skills and reports.
 - **Mail Module:** Standard Odoo module for internal communication and messaging.
 - **Base Module:** Core Odoo framework functionality.
