@@ -26,7 +26,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install odoo --extra-index-url https://nightly.odoo.com/18.0/nightly/pip/
+        python -m pip install https://nightly.odoo.com/18.0/nightly/pip/odoo-18.0.latest.tar.gz
         python -m pip install -r requirements.txt
     # - name: Lint with flake8
     #   run: |
