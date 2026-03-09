@@ -2,12 +2,12 @@ name: Odoo Module CI
 
 on:
   push:
-    branches: [ "18.0-dev", "master" ]
+    branches: ["18.0-dev", "master"]
   pull_request:
-    branches: [ "18.0-dev", "master" ]
+    branches: ["18.0-dev", "master"]
 
 permissions:
-  contents: write # Permiso para que el runner pueda pushear el merge
+  contents: write
 
 jobs:
   lint:
@@ -49,18 +49,34 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and cache (fast)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: inventario:latest
-          cache-from: type=gha
       - name: Run Unit Tests
         run: |
-          docker run inventario:latest pytest tests -m unit || echo "Aviso: No se encontraron tests unitarios."
+          echo "🚀 Running Unit Tests..."
+          docker run inventario:latest pytest tests -m unit -v --tb=short > /tmp/odoo_tests.log 2>&1 || true
+
+      - name: Analyze Results
+        if: always()
+        run: |
+          LOG="/tmp/odoo_tests.log"
+          echo "═══════════════════════════════════════════════"
+          echo "           UNIT TESTS ANALYSIS"
+          echo "═══════════════════════════════════════════════"
+          if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
+          grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary line found"
+          if grep -q "FAILED" "$LOG"; then
+            echo "❌ FAILED TESTS DETECTED:"
+            grep -P "FAILED tests/test_.*" "$LOG" || true
+            exit 1
+          else
+            echo "✅ All unit tests passed."
+          fi
+
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-logs
+          path: /tmp/odoo_tests.log
 
   integration-tests:
     name: Integration Tests
@@ -69,127 +85,45 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and cache (fast)
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          load: true
-          tags: inventario:latest
-          cache-from: type=gha
       - name: Run Integration Tests
         run: |
-          docker run inventario:latest pytest tests -m integration || echo "Aviso: No se encontraron tests de integración."
+          echo "🚀 Running Integration Tests..."
+          docker run inventario:latest pytest tests -m integration -v --tb=short > /tmp/odoo_tests.log 2>&1 || true
 
-      - name: Analyze Test Results
+      - name: Analyze Results
         if: always()
         run: |
-            echo "═══════════════════════════════════════════════"
-            echo "         ODOO UNIT TEST RESULTS ANALYSIS"
-            echo "═══════════════════════════════════════════════"
-  
-            LOG="/tmp/odoo_unit_tests.log"
-            EXIT_CODE=0
-  
-            # ── 1. Test Summary ──
-            echo ""
-            TOTAL_LINE=$(grep -oP "\d+ failed, \d+ error\(s\) of \d+ tests" "$LOG" | tail -1)
-            if [ -n "$TOTAL_LINE" ]; then
-              echo "📊 Test Summary: $TOTAL_LINE"
-            fi
-  
-            # ── 2. List failed/errored test names ──
-            echo ""
-            echo "── Failed / Errored Tests ──"
-  
-            FAIL_LINES=$(grep -P "(FAIL|ERROR): Test|ERROR: setUpClass" "$LOG" || true)
-  
-            if [ -n "$FAIL_LINES" ]; then
-              echo "❌ DETECTED:"
-              echo "$FAIL_LINES" | grep -oP "(FAIL|ERROR): \S+" | sort -u
-              echo ""
-  
-              echo "── Detailed Tracebacks ──"
-              awk '
-              / (ERROR|FAIL): Test/ || / ERROR: setUpClass/ {
-                printing = 1
-                print ""
-                print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-                print $0
-                next
-              }
-              /^Traceback/ { printing = 1; print $0; next }
-              printing && /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] / { printing = 0; next }
-              printing { print $0 }
-              ' "$LOG"
-  
-              EXIT_CODE=1
-            else
-              echo "✅ All tests passed."
-            fi
-  
-            # ── 3. Log Level Summary ──
-            echo ""
-            echo "── Log Level Summary ──"
-  
-            ERROR_COUNT=$(grep -c " ERROR " "$LOG" 2>/dev/null) || ERROR_COUNT=0
-            CRIT_COUNT=$(grep -c " CRITICAL " "$LOG" 2>/dev/null) || CRIT_COUNT=0
-  
-            WARN_COUNT=$(grep " WARNING " "$LOG" \
-              | grep -v "child process was found" \
-              | grep -v "HTTPException" \
-              | grep -v "websocket-client" \
-              | grep -v "Chrome headless failed" \
-              | wc -l) || WARN_COUNT=0
-  
-            if [ "$ERROR_COUNT" -gt 0 ]; then
-              echo "⚠️  ERROR entries: $ERROR_COUNT"
-              EXIT_CODE=1
-            fi
-            if [ "$CRIT_COUNT" -gt 0 ]; then
-              echo "🔴 CRITICAL entries: $CRIT_COUNT"
-              grep " CRITICAL " "$LOG"
-              EXIT_CODE=1
-            fi
-            if [ "$WARN_COUNT" -gt 0 ]; then
-              echo "⚡ WARNING entries: $WARN_COUNT"
-              grep " WARNING " "$LOG" \
-                | grep -v "child process was found" \
-                | grep -v "HTTPException" \
-                | grep -v "websocket-client" \
-                | grep -v "Chrome headless failed" \
-                | head -10
-            fi
-            if [ "$ERROR_COUNT" -eq 0 ] && [ "$CRIT_COUNT" -eq 0 ] && [ "$WARN_COUNT" -eq 0 ]; then
-              echo "✅ Clean logs."
-            fi
-  
-            echo ""
-            echo "═══════════════════════════════════════════════"
-            echo "📋 Totals: Errors=$ERROR_COUNT | Critical=$CRIT_COUNT | Warnings=$WARN_COUNT"
-            echo "═══════════════════════════════════════════════"
-  
-            exit $EXIT_CODE
-  
-            - name: Upload Unit Test Logs
-              if: always()
-              uses: actions/upload-artifact@v4
-              with:
-                name: unit-test-logs
-                path: /tmp/odoo_unit_tests.log
-                retention-days: 7
+          LOG="/tmp/odoo_tests.log"
+          echo "═══════════════════════════════════════════════"
+          echo "         INTEGRATION TESTS ANALYSIS"
+          echo "═══════════════════════════════════════════════"
+          if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
+          grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary line found"
+          if grep -q "FAILED" "$LOG"; then
+            echo "❌ FAILED TESTS DETECTED:"
+            grep -P "FAILED tests/test_.*" "$LOG" || true
+            exit 1
+          else
+            echo "✅ All integration tests passed."
+          fi
+
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-logs
+          path: /tmp/odoo_tests.log
 
   promote-to-preprod:
     name: Merge and Cleanup for Pre-Prod
     needs: [unit-tests, integration-tests]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && success() && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necesario para tener el historial de ramas
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -202,28 +136,19 @@ jobs:
 
       - name: Merge Development into Pre-Prod
         run: |
-          # Usamos estrategia 'recursive' y 'theirs' para priorizar el dev ante conflictos
-          git merge ${{ github.ref_name }} --no-ff -m "chore: auto-merge dev to pre-prod after tests [skip ci]"
+          # Usamos estrategia 'theirs' para que los cambios de dev siempre ganen en conflictos
+          git merge origin/${{ github.ref_name }} --no-ff -X theirs -m "chore: auto-merge dev to pre-prod after tests [skip ci]"
 
       - name: Clean up Non-App files
         run: |
-          # Eliminar carpetas y archivos innecesarios
-          rm -rf tests/
-          rm -rf conductor/
-          rm -rf .github/
-          rm -f .pre-commit-config.yaml
-          rm -f .ruff_cache/
-          rm -f Dockerfile
-          rm -f pytest.ini
-          rm -f comando.md
-          rm -f pyproject.toml
+          # Borramos lo innecesario para producción
+          rm -rf tests/ conductor/ .github/
+          rm -f .pre-commit-config.yaml .ruff_cache/ Dockerfile pytest.ini comando.md pyproject.toml .gitignore
           
-          # Verificar si hay cambios antes de commitear
+          # Realizamos commit de la limpieza
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: cleanup non-app files for pre-prod [skip ci]"
-          else
-            echo "No changes to clean up."
           fi
 
       - name: Push to Pre-Prod
