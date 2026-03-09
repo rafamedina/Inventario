@@ -32,7 +32,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Build Test Image
         uses: docker/build-push-action@v5
         with:
@@ -42,7 +41,6 @@ jobs:
           outputs: type=docker,dest=/tmp/inventario.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -60,19 +58,16 @@ jobs:
         with:
           name: odoo-image
           path: /tmp
-
       - name: Load Image into Docker
         run: docker load < /tmp/inventario.tar
-
-      - name: Run Pytest (con pytest-odoo)
+      - name: Run Pytest
         run: |
           echo "🚀 Ejecutando tests unitarios..."
-          # 💡 Definimos los parámetros de Odoo para que pytest-odoo inicialice el entorno
-          docker run --rm inventario:latest pytest tests -m unit -v --tb=short --color=yes \
+          # 💡 Apuntamos a la carpeta del módulo y definimos correctamente el path de addons
+          docker run --rm inventario:latest pytest Inventario/tests -m unit -v --tb=short --color=yes \
             --odoo-database=test_ci_unit \
-            --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,. \
+            --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
             2>&1 | tee /tmp/unit_tests.log || true
-
       - name: Analyze Results
         if: always()
         run: |
@@ -83,6 +78,12 @@ jobs:
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
           grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary found"
           if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-logs
+          path: /tmp/unit_tests.log
 
   integration-tests:
     name: 🌐 Integration Tests
@@ -94,19 +95,15 @@ jobs:
         with:
           name: odoo-image
           path: /tmp
-
       - name: Load Image into Docker
         run: docker load < /tmp/inventario.tar
-
-      - name: Run Pytest (con pytest-odoo)
+      - name: Run Pytest
         run: |
           echo "🚀 Ejecutando tests de integración..."
-          # 💡 Los tests de integración necesitan Chrome, que ya está configurado en el Dockerfile
-          docker run --rm inventario:latest pytest tests -m integration -v --tb=short --color=yes \
+          docker run --rm inventario:latest pytest Inventario/tests -m integration -v --tb=short --color=yes \
             --odoo-database=test_ci_int \
-            --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,. \
+            --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
             2>&1 | tee /tmp/int_tests.log || true
-
       - name: Analyze Results
         if: always()
         run: |
@@ -117,6 +114,12 @@ jobs:
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
           grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary found"
           if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
+      - name: Upload Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-logs
+          path: /tmp/int_tests.log
 
   promote-to-preprod:
     name: 🔄 Sync & Clean Pre-Prod
@@ -128,7 +131,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Force Sync Pre-Prod
         run: |
           git config user.name "github-actions[bot]"
