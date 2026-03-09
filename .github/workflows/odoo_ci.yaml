@@ -52,20 +52,36 @@ jobs:
     name: 🔬 Unit Tests
     needs: build
     runs-on: ubuntu-latest
+    services:
+      # 🐘 Levantamos un Postgres real para los tests
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Download Image
         uses: actions/download-artifact@v4
         with:
           name: odoo-image
           path: /tmp
-      - name: Load Image into Docker
+      - name: Load Image
         run: docker load < /tmp/inventario.tar
       - name: Run Pytest
         run: |
-          echo "🚀 Ejecutando tests unitarios..."
-          # 💡 Apuntamos a la carpeta del módulo y definimos correctamente el path de addons
-          docker run --rm inventario:latest pytest Inventario/tests -m unit -v --tb=short --color=yes \
+          echo "🚀 Ejecutando tests unitarios con DB externa..."
+          # Usamos --network host para conectar con el servicio postgres de GitHub
+          docker run --rm --network host inventario:latest pytest Inventario/tests -m unit -v --tb=short --color=yes \
             --odoo-database=test_ci_unit \
+            --odoo-db_host=127.0.0.1 \
+            --odoo-db_user=odoo \
+            --odoo-db_password=odoo \
             --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
             2>&1 | tee /tmp/unit_tests.log || true
       - name: Analyze Results
@@ -75,9 +91,8 @@ jobs:
           echo "═══════════════════════════════════════════════"
           echo "           UNIT TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
-          if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
           grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary found"
-          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
+          if grep -q "FAILED" "$LOG" || grep -q "ERROR" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
       - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -89,19 +104,34 @@ jobs:
     name: 🌐 Integration Tests
     needs: build
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - name: Download Image
         uses: actions/download-artifact@v4
         with:
           name: odoo-image
           path: /tmp
-      - name: Load Image into Docker
+      - name: Load Image
         run: docker load < /tmp/inventario.tar
       - name: Run Pytest
         run: |
-          echo "🚀 Ejecutando tests de integración..."
-          docker run --rm inventario:latest pytest Inventario/tests -m integration -v --tb=short --color=yes \
+          echo "🚀 Ejecutando tests de integración con DB externa..."
+          docker run --rm --network host inventario:latest pytest Inventario/tests -m integration -v --tb=short --color=yes \
             --odoo-database=test_ci_int \
+            --odoo-db_host=127.0.0.1 \
+            --odoo-db_user=odoo \
+            --odoo-db_password=odoo \
             --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
             2>&1 | tee /tmp/int_tests.log || true
       - name: Analyze Results
@@ -111,9 +141,8 @@ jobs:
           echo "═══════════════════════════════════════════════"
           echo "         INTEGRATION TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
-          if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
           grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary found"
-          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
+          if grep -q "FAILED" "$LOG" || grep -q "ERROR" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
       - name: Upload Logs
         if: always()
         uses: actions/upload-artifact@v4
