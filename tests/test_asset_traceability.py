@@ -1,7 +1,6 @@
 from odoo.tests import common
 
 
-
 class TestAssetTraceability(common.TransactionCase):
     def setUp(self):
         super(TestAssetTraceability, self).setUp()

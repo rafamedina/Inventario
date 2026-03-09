@@ -3,7 +3,6 @@ from datetime import date
 from odoo.tests import common
 
 
-
 class TestMaintenanceChecklists(common.TransactionCase):
     def setUp(self):
         super(TestMaintenanceChecklists, self).setUp()

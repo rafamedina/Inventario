@@ -1,9 +1,7 @@
 from datetime import date, timedelta
 
-
 from odoo import fields
 from odoo.tests import common
-
 
 
 class TestMaintenanceLifecycle(common.TransactionCase):

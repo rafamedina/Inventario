@@ -1,5 +1,6 @@
 from odoo.tests.common import TransactionCase
 
+
 class TestAssetQR(TransactionCase):
     def setUp(self):
         super(TestAssetQR, self).setUp()
