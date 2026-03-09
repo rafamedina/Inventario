@@ -1,7 +1,9 @@
+import pytest
 from odoo.tests import common
 from odoo import fields
 from datetime import timedelta, date
 
+@pytest.mark.integration
 class TestMaintenanceLifecycle(common.TransactionCase):
 
     def setUp(self):

@@ -1,5 +1,7 @@
+import pytest
 from odoo.tests import common
 
+@pytest.mark.integration
 class TestEmployeeHistoryUI(common.TransactionCase):
 
     def setUp(self):

@@ -1,8 +1,10 @@
+import pytest
 from odoo.tests import common
 from odoo import fields
 from odoo.exceptions import UserError
 from datetime import timedelta
 
+@pytest.mark.integration
 class TestInventoryAssetImport(common.TransactionCase):
 
     def setUp(self):

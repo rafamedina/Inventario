@@ -1,10 +1,12 @@
+import pytest
 from odoo.tests import common
 from odoo.exceptions import AccessError
 
+@pytest.mark.integration
 class TestAssetTraceability(common.TransactionCase):
 
     def setUp(self):
-        super(TestAssetTraceability, self).setUp()
+        super(TestAssetAssetTraceability, self).setUp()
         # Create some employees for testing
         self.employee_1 = self.env['hr.employee'].create({'name': 'Employee 1'})
         self.employee_2 = self.env['hr.employee'].create({'name': 'Employee 2'})

@@ -1,7 +1,9 @@
+import pytest
 from odoo.tests import common
 from odoo.exceptions import ValidationError, AccessError
 from odoo import fields
 
+@pytest.mark.unit
 class TestSubcategoryLink(common.TransactionCase):
 
     def setUp(self):

@@ -1,8 +1,8 @@
+import pytest
 from odoo.tests import common
 from odoo import fields
-import threading
-import time
 
+@pytest.mark.unit
 class TestIDGeneration(common.TransactionCase):
 
     def setUp(self):

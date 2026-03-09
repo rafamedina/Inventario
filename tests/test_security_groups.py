@@ -1,6 +1,8 @@
+import pytest
 from odoo.tests.common import TransactionCase
 from odoo.exceptions import AccessError
 
+@pytest.mark.unit
 class TestSecurityGroups(TransactionCase):
     def test_security_group_creation(self):
         """Verificar que el grupo de seguridad se ha creado correctamente."""

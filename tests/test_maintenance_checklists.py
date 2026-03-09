@@ -1,7 +1,9 @@
+import pytest
 from odoo.tests import common
 from odoo.exceptions import ValidationError
 from datetime import date
 
+@pytest.mark.integration
 class TestMaintenanceChecklists(common.TransactionCase):
 
     def setUp(self):
