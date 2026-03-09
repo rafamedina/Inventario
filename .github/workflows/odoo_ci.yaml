@@ -79,13 +79,21 @@ jobs:
         run: docker load < /tmp/inventario.tar
       - name: Run Pytest
         run: |
+          echo "🚀 Creating temporary Odoo config..."
+          cat <<EOF > /tmp/odoo_unit.conf
+          [options]
+          db_host = 127.0.0.1
+          db_user = odoo
+          db_password = odoo
+          addons_path = /usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+          EOF
+
           echo "🚀 Running unit tests with external DB..."
-          docker run --rm --network host inventario:latest \
-            pytest /mnt/extra-addons/Inventario/tests -m unit -v --tb=short --color=yes \
+          docker run --rm --network host \
+            -v /tmp/odoo_unit.conf:/tmp/odoo.conf \
+            inventario:latest pytest /mnt/extra-addons/Inventario/tests -m unit -v --tb=short --color=yes \
+            --odoo-config=/tmp/odoo.conf \
             --odoo-database=test_ci_unit \
-            --odoo-db-host=127.0.0.1 \
-            --odoo-db-user=odoo \
-            --odoo-db-password=odoo \
             --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
             2>&1 | tee /tmp/unit_tests.log || true
       - name: Analyze Results
