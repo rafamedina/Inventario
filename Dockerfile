@@ -1,45 +1,58 @@
 # ─────────────────────────────────────────────────────────────
-# 🐳 Dockerfile Multi-stage: Estructura Estándar de Odoo
+# 🐳 Dockerfile Profesional Multi-stage para Odoo 18 (Modulo Inventario)
 # ─────────────────────────────────────────────────────────────
 
-# --- Etapa 1: Base ---
+# --- Etapa 1: Base (Común para todos los entornos) ---
 FROM odoo:18.0 AS base
 USER root
-ENV DEBIAN_FRONTEND=noninteractive
 
+# Instalamos solo dependencias de sistema críticas
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Definimos una carpeta de addons limpia
 WORKDIR /mnt/extra-addons
 
-# --- Etapa 2: Test ---
+# --- Etapa 2: Test (Incluye Chrome y herramientas de testing) ---
 FROM base AS test
 USER root
 
-# Instalación de Chrome
-RUN apt-get update && apt-get install -y --no-install-recommends wget gnupg2 \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+# Instalamos Google Chrome para Integration Tests (Tours)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    gnupg2 \
+    && wget -qO- https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update && apt-get install -y --no-install-recommends google-chrome-stable \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
+# Wrapper para que Odoo encuentre Chrome con los flags de seguridad de Docker
 RUN printf '#!/bin/bash\nexec google-chrome-stable --no-sandbox --disable-gpu --disable-dev-shm-usage "$@"\n' > /usr/bin/chromium-browser \
     && chmod +x /usr/bin/chromium-browser
 
-RUN pip3 install --no-cache-dir --break-system-packages pytest pytest-odoo
+# Dependencias Python para tests (Odoo 18 nativo prefiere websocket-client para tours)
+RUN pip3 install --no-cache-dir --break-system-packages websocket-client
 
-# IMPORTANTE: Copiamos el código DENTRO de una carpeta con el nombre del módulo
-COPY . ./Inventario
+# Copiamos todo el módulo (incluyendo tests y docs para esta etapa)
+COPY . /mnt/extra-addons/Inventario
 RUN chown -R odoo:odoo /mnt/extra-addons/Inventario
 
 USER odoo
 
-# --- Etapa 3: Prod ---
+# --- Etapa 3: Prod (Imagen limpia para despliegue) ---
 FROM base AS prod
 USER root
-COPY . ./Inventario
-RUN rm -rf Inventario/tests Inventario/conductor Inventario/.github Inventario/.pre-commit-config.yaml
+
+# Copiamos solo el código necesario
+COPY . /mnt/extra-addons/Inventario
+
+# Limpieza manual profunda para producción
+RUN rm -rf /mnt/extra-addons/Inventario/tests \
+    && rm -rf /mnt/extra-addons/Inventario/conductor \
+    && rm -rf /mnt/extra-addons/Inventario/.github \
+    && rm -rf /mnt/extra-addons/Inventario/.ruff_cache
+
 RUN chown -R odoo:odoo /mnt/extra-addons/Inventario
+
 USER odoo
