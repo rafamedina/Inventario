@@ -3,34 +3,29 @@ FROM odoo:18.0
 
 USER root
 
-# Instalar dependencias del sistema para Chrome, compilación de paquetes Python y herramientas de test
-RUN apt-get update && apt-get install -y \
-    python3-pip \
+# Evitar diálogos interactivos
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar solo Google Chrome (necesario para tests de UI) y certificados
+RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
-    gnupg \
-    build-essential \
-    python3-dev \
-    libldap2-dev \
-    libsasl2-dev \
-    libpq-dev \
-    libxml2-dev \
-    libxslt1-dev \
-    libcairo2-dev \
-    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
-    && apt-get update && apt-get install -y \
+    gnupg2 \
+    ca-certificates \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg \
+    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
     google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Configurar el directorio de trabajo
+# Directorio de trabajo
 WORKDIR /opt/odoo/custom_addons/Inventario
 
-# Copiar el contenido del módulo
+# Copiar el módulo
 COPY . .
 
-# Instalar las dependencias de Python
-# Usamos --break-system-packages si es necesario en Python 3.12+ para instalar sobre el sistema en Docker
-RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt pytest ruff
+# Instalar los requerimientos ligeros (solo herramientas de test y extras)
+# Usamos --break-system-packages para Python 3.12+ en Debian
+RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
-# Volver al usuario odoo por seguridad
+# Volver al usuario odoo
 USER odoo
