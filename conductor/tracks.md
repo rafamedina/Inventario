@@ -4,8 +4,3 @@
 
 - [x] **Track: Fix maintenance display in asset form** (User Fixed)
 *Link: [./tracks/fix_maintenance_display_20260306/](./tracks/fix_maintenance_display_20260306/)*
-
----
-
-- [x] **Track: Fix missing model hr.employee.skill.report**
-*Link: [./tracks/fix_hr_skills_dep_20260309/](./tracks/fix_hr_skills_dep_20260309/)*
