@@ -2,12 +2,12 @@ name: Odoo Module CI
 
 on:
   push:
-    branches: [ "18.0-dev", "master" ]
+    branches: ["18.0-dev", "master"]
   pull_request:
-    branches: [ "18.0-dev", "master" ]
+    branches: ["18.0-dev", "master"]
 
 permissions:
-  contents: write # Permiso para que el runner pueda pushear el merge
+  contents: write
 
 jobs:
   lint:
@@ -60,7 +60,60 @@ jobs:
           cache-from: type=gha
       - name: Run Unit Tests
         run: |
-          docker run inventario:latest pytest tests -m unit || echo "Aviso: No se encontraron tests unitarios."
+          docker run inventario:latest pytest tests -m unit > /tmp/odoo_unit_tests.log 2>&1 || true
+
+      - name: Analyze Test Results
+        if: always()
+        run: |
+          echo "═══════════════════════════════════════════════"
+          echo "         ODOO UNIT TEST RESULTS ANALYSIS"
+          echo "═══════════════════════════════════════════════"
+
+          LOG="/tmp/odoo_unit_tests.log"
+          EXIT_CODE=0
+
+          if [ ! -f "$LOG" ]; then
+            echo "❌ Log file not found at $LOG"
+            exit 1
+          fi
+
+          echo ""
+          TOTAL_LINE=$(grep -E "[0-9]+ passed|[0-9]+ failed" "$LOG" | tail -1)
+          if [ -n "$TOTAL_LINE" ]; then
+            echo "📊 Test Summary: $TOTAL_LINE"
+          fi
+
+          echo ""
+          echo "── Failed / Errored Tests ──"
+          FAIL_LINES=$(grep -P "(FAIL|ERROR): Test|ERROR: setUpClass|FAILED tests" "$LOG" || true)
+
+          if [ -n "$FAIL_LINES" ]; then
+            echo "❌ DETECTED:"
+            echo "$FAIL_LINES"
+            EXIT_CODE=1
+          else
+            echo "✅ All tests passed according to summary."
+          fi
+
+          echo ""
+          echo "── Log Level Summary ──"
+          ERROR_COUNT=$(grep -c " ERROR " "$LOG" 2>/dev/null) || ERROR_COUNT=0
+          if [ "$ERROR_COUNT" -gt 0 ]; then
+            echo "⚠️  ERROR entries: $ERROR_COUNT"
+            EXIT_CODE=1
+          else
+            echo "✅ No Odoo errors in logs."
+          fi
+
+          exit $EXIT_CODE
+
+      - name: Upload Unit Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-logs
+          path: /tmp/odoo_unit_tests.log
+          retention-days: 7
 
   integration-tests:
     name: Integration Tests
@@ -80,18 +133,26 @@ jobs:
           cache-from: type=gha
       - name: Run Integration Tests
         run: |
-          docker run inventario:latest pytest tests -m integration || echo "Aviso: No se encontraron tests de integración."
+          docker run inventario:latest pytest tests -m integration > /tmp/odoo_integration_tests.log 2>&1 || true
+
+      - name: Analyze Integration Results
+        if: always()
+        run: |
+          LOG="/tmp/odoo_integration_tests.log"
+          if [ -f "$LOG" ]; then
+            grep -E "[0-9]+ passed|[0-9]+ failed" "$LOG" || echo "No summary found"
+          fi
 
   promote-to-preprod:
     name: Merge and Cleanup for Pre-Prod
     needs: [unit-tests, integration-tests]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
+    if: github.event_name == 'push' && success() && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Source Branch
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necesario para tener el historial de ramas
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -104,28 +165,15 @@ jobs:
 
       - name: Merge Development into Pre-Prod
         run: |
-          # Usamos estrategia 'recursive' y 'theirs' para priorizar el dev ante conflictos
           git merge ${{ github.ref_name }} --no-ff -m "chore: auto-merge dev to pre-prod after tests [skip ci]"
 
       - name: Clean up Non-App files
         run: |
-          # Eliminar carpetas y archivos innecesarios
-          rm -rf tests/
-          rm -rf conductor/
-          rm -rf .github/
-          rm -f .pre-commit-config.yaml
-          rm -f .ruff_cache/
-          rm -f Dockerfile
-          rm -f pytest.ini
-          rm -f comando.md
-          rm -f pyproject.toml
-          
-          # Verificar si hay cambios antes de commitear
+          rm -rf tests/ conductor/ .github/
+          rm -f .pre-commit-config.yaml .ruff_cache/ Dockerfile pytest.ini comando.md pyproject.toml
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
             git commit -m "chore: cleanup non-app files for pre-prod [skip ci]"
-          else
-            echo "No changes to clean up."
           fi
 
       - name: Push to Pre-Prod
