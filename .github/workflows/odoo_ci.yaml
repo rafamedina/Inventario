@@ -5,20 +5,23 @@ on:
     branches: ["18.0-dev", "master"]
   pull_request:
     branches: ["18.0-dev", "master"]
+  workflow_dispatch: # Enable manual execution for debugging
 
 permissions:
-  contents: write
+  contents: read # Secure default: read-only access
 
 jobs:
   lint:
     name: 🔍 Lint (Ruff)
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip" # Optimized caching for dependencies
       - name: Run Ruff
         run: |
           pip install ruff
@@ -28,6 +31,7 @@ jobs:
     name: 🐳 Build & Export Image
     needs: lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - name: Set up Docker Buildx
@@ -52,8 +56,8 @@ jobs:
     name: 🔬 Unit Tests
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     services:
-      # 🐘 Levantamos un Postgres real para los tests
       postgres:
         image: postgres:15
         env:
@@ -75,8 +79,7 @@ jobs:
         run: docker load < /tmp/inventario.tar
       - name: Run Pytest
         run: |
-          echo "🚀 Ejecutando tests unitarios con DB externa..."
-          # Usamos --network host para conectar con el servicio postgres de GitHub
+          echo "🚀 Running unit tests with external DB..."
           docker run --rm --network host inventario:latest pytest Inventario/tests -m unit -v --tb=short --color=yes \
             --odoo-database=test_ci_unit \
             --odoo-db_host=127.0.0.1 \
@@ -104,6 +107,7 @@ jobs:
     name: 🌐 Integration Tests
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:15
@@ -126,7 +130,7 @@ jobs:
         run: docker load < /tmp/inventario.tar
       - name: Run Pytest
         run: |
-          echo "🚀 Ejecutando tests de integración con DB externa..."
+          echo "🚀 Running integration tests with external DB..."
           docker run --rm --network host inventario:latest pytest Inventario/tests -m integration -v --tb=short --color=yes \
             --odoo-database=test_ci_int \
             --odoo-db_host=127.0.0.1 \
@@ -155,6 +159,9 @@ jobs:
     needs: [unit-tests, integration-tests]
     if: github.event_name == 'push' && success() && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # Specific write permission for syncing branches
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -165,8 +172,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -B 18.0-pre-prod
-          rm -rf tests/ conductor/ .github/
-          rm -f .pre-commit-config.yaml .ruff_cache/ Dockerfile pytest.ini pyproject.toml comando.md
+          # Systematic cleanup of non-production files
+          rm -rf tests/ conductor/ .github/ .ruff_cache/
+          rm -f .gitignore .pre-commit-config.yaml Dockerfile pytest.ini pyproject.toml comando.md requirements.txt image.png
           git add -A
-          git commit -m "chore: production-ready cleanup [skip ci]" || echo "Sin cambios"
+          git commit -m "chore: production-ready cleanup [skip ci]" || echo "No changes to commit"
           git push origin 18.0-pre-prod --force

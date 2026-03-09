@@ -4,3 +4,5 @@
 
 - [x] **Track: Fix maintenance display in asset form** (User Fixed)
       _Link: [./tracks/fix_maintenance_display_20260306/](./tracks/fix_maintenance_display_20260306/)_
+- [ ] **Track: CI/CD Pipeline Optimization & Security Hardening**
+      _Link: [./tracks/pipeline_optimization_20260309/](./tracks/pipeline_optimization_20260309/)_
