@@ -6,7 +6,7 @@ USER root
 # Evitar diálogos interactivos
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalar solo Google Chrome (necesario para tests de UI) y certificados
+# 1. Instalar Google Chrome (necesario para tests de UI)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     gnupg2 \
@@ -17,15 +17,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# Directorio de trabajo
-WORKDIR /opt/odoo/custom_addons/Inventario
+# 2. Instalar pytest (Solo lo que necesitamos para ejecutar los tests dentro del contenedor)
+# Usamos --break-system-packages para Python 3.12+
+RUN pip3 install --no-cache-dir --break-system-packages pytest
 
-# Copiar el módulo
+# Directorio de trabajo y copia del módulo
+WORKDIR /opt/odoo/custom_addons/Inventario
 COPY . .
 
-# Instalar los requerimientos ligeros (solo herramientas de test y extras)
-# Usamos --break-system-packages para Python 3.12+ en Debian
-RUN pip3 install --no-cache-dir --break-system-packages -r requirements.txt
-
-# Volver al usuario odoo
 USER odoo
