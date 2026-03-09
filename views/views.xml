@@ -182,20 +182,20 @@
         <field name="model">inventory.asset</field>
         <field name="arch" type="xml">
             <list string="Inventario" decoration-danger="estado_mantenimiento == 'vencido'" decoration-warning="estado_mantenimiento == 'proximo'">
-                <field name="identificador_final" decoration-bf="1"/> 
+                <field name="identificador_final" decoration-bf="1"/>
                 <field name="nombre"/>
-                <field name="categoria_id"/> 
-                <field name="subcategoria_id"/> 
-                <field name="ubicacion_id"/> 
+                <field name="categoria_id"/>
+                <field name="subcategoria_id"/>
+                <field name="ubicacion_id"/>
                 <field name="estado_mantenimiento" column_invisible="True"/>
                 <field name="responsable_display"/>
                 <field name="propietario_display" optional="show"/>
                 <field name="plan_id" widget="badge" decoration-info="1"/>
-                <field name="estado_mantenimiento_proceso" widget="badge" 
-                       decoration-success="estado_mantenimiento_proceso == 'realizado'" 
-                       decoration-warning="estado_mantenimiento_proceso == 'en_proceso'" 
+                <field name="estado_mantenimiento_proceso" widget="badge"
+                       decoration-success="estado_mantenimiento_proceso == 'realizado'"
+                       decoration-warning="estado_mantenimiento_proceso == 'en_proceso'"
                        decoration-muted="estado_mantenimiento_proceso == 'no_iniciado'"/>
-                <field name="proximo_mantenimiento" widget="remaining_days"/>                
+                <field name="proximo_mantenimiento" widget="remaining_days"/>
             </list>
         </field>
     </record>
@@ -206,19 +206,19 @@
         <field name="arch" type="xml">
             <form string="Activo">
                 <header>
-                    <button name="action_start_maintenance" string="Iniciar Mantenimiento" type="object" class="oe_highlight" 
+                    <button name="action_start_maintenance" string="Iniciar Mantenimiento" type="object" class="oe_highlight"
                             invisible="estado_mantenimiento_proceso == 'en_proceso'"/>
-                    <button name="action_finish_maintenance" string="Finalizar Mantenimiento" type="object" class="oe_highlight" 
+                    <button name="action_finish_maintenance" string="Finalizar Mantenimiento" type="object" class="oe_highlight"
                             invisible="estado_mantenimiento_proceso != 'en_proceso'"/>
-                    
+
                     <button name="%(action_report_asset_label)d" string="Imprimir ID" type="action" class="oe_highlight"/>
-                    
+
                     <field name="estado_mantenimiento_proceso" widget="statusbar" statusbar_visible="no_iniciado,en_proceso,realizado"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archivado (Baja)" bg_color="bg-danger" invisible="active == True"/>
                     <widget name="web_ribbon" title="En Mantenimiento" bg_color="bg-warning" invisible="estado_mantenimiento_proceso != 'en_proceso'"/>
-                    
+
                     <div class="oe_button_box" name="button_box">
                     </div>
 
@@ -230,12 +230,12 @@
                     <group>
                         <group string="Clasificación">
                             <field name="active" invisible="1"/>
-                            
+
                             <field name="categoria_id" widget="selection"/>
                             <field name="subcategoria_id" widget="selection"/>
                             <field name="ubicacion_id" widget="selection"/>
                             <field name="anio_inclusion"/>
-                            
+
                             <field name="tipo"/>
                             <field name="localizacion"/>
                         </group>
@@ -276,8 +276,8 @@
                                     <field name="version"/>
                                 </group>
                                 <group string="Fechas de Mantenimiento">
-                                    <field name="plan_id"/> 
-                                    <field name="ultimomantenimiento"/> 
+                                    <field name="plan_id"/>
+                                    <field name="ultimomantenimiento"/>
                                     <field name="proximo_mantenimiento"/>
                                 </group>
                             </group>
@@ -303,7 +303,7 @@
                              <separator string="Observaciones"/>
                              <field name="notas"/>
                         </page>
-                        
+
                         <page string="Historial Asignaciones">
                             <field name="history_ids" readonly="1">
                                 <list>
@@ -314,7 +314,7 @@
                                 </list>
                             </field>
                         </page>
-                        
+
                         <page string="Configuración ID">
                             <group>
                                 <field name="uuid_activo"/>
@@ -375,7 +375,7 @@
             </form>
         </field>
     </record>
-    
+
     <record id="view_plans_asset_tree" model="ir.ui.view">
         <field name="name">plans.asset.list</field>
         <field name="model">plans.asset</field>
@@ -485,7 +485,7 @@
         <field name="res_model" >plans.asset</field>
         <field name="view_mode">list,form</field>
     </record>
-    
+
     <record id="action_inventory_category" model="ir.actions.act_window">
         <field name="name">Categorías</field>
         <field name="res_model">inventory.category</field>
@@ -538,11 +538,11 @@
     </record>
 
     <menuitem id="menu_inventory_root" name="Gestión de Activos" sequence="10" groups="Inventario.group_inventory_manager"/>
-    
+
     <menuitem id="menu_operations" name="Operaciones" parent="menu_inventory_root" sequence="1"/>
     <menuitem id="menu_asset_list" name="Inventario" parent="menu_operations" action="action_inventory_asset" sequence="1"/>
     <menuitem id="menu_inventory_employees" name="Empleados" parent="menu_operations" action="action_inventory_employee" sequence="2"/>
-    
+
     <menuitem id="menu_maintenance_root" name="Mantenimiento" parent="menu_inventory_root" sequence="2"/>
     <menuitem id="menu_plans_list" name="Planes" parent="menu_maintenance_root" action="action_plans_asset" sequence="1"/>
 

@@ -2,9 +2,9 @@ name: Odoo Module CI
 
 on:
   push:
-    branches: [ "18.0-dev", "master" ]
+    branches: ["18.0-dev", "master"]
   pull_request:
-    branches: [ "18.0-dev", "master" ]
+    branches: ["18.0-dev", "master"]
 
 jobs:
   lint:

@@ -6,9 +6,9 @@
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_employee_assets" 
-                        class="oe_stat_button" 
-                        icon="fa-barcode" 
+                <button name="action_view_employee_assets"
+                        class="oe_stat_button"
+                        icon="fa-barcode"
                         type="object"
                         groups="Inventario.group_inventory_manager"
                         help="Ver perfil de activos de este empleado">

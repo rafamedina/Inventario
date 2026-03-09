@@ -1,12 +1,14 @@
-from . import test_import
-from . import test_subcategory_link
-from . import test_id_generation
-from . import test_maintenance_lifecycle
-from . import test_maintenance_checklists
-from . import test_asset_traceability
-from . import test_asset_qr
-from . import test_employee_history_ui
-from . import test_qr_relocation
-from . import test_security_groups
-from . import test_business_robustness
-from . import test_employee_asset_label_ui
+from . import (
+    test_asset_qr,
+    test_asset_traceability,
+    test_business_robustness,
+    test_employee_asset_label_ui,
+    test_employee_history_ui,
+    test_id_generation,
+    test_import,
+    test_maintenance_checklists,
+    test_maintenance_lifecycle,
+    test_qr_relocation,
+    test_security_groups,
+    test_subcategory_link,
+)

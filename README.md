@@ -5,6 +5,7 @@ Este módulo implementa un sistema de roles para restringir el acceso a la gesti
 ## Grupos de Seguridad
 
 ### Inventory / Full Access
+
 - **ID Interno:** `Inventario.group_inventory_manager`
 - **Permisos:** Control total (Lectura, Escritura, Creación, Eliminación) sobre todos los modelos del módulo (Activos, Categorías, Ubicaciones, Mantenimientos).
 - **Visibilidad:** Solo los usuarios en este grupo pueden ver el icono del módulo "Gestión de Activos" en el tablero principal y la pestaña de activos en la ficha del empleado.

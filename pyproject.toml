@@ -1,0 +1,18 @@
+[tool.ruff]
+# Nivel de compatibilidad con Odoo 18 (Python 3.12)
+target-version = "py312"
+line-length = 150
+
+[tool.ruff.lint]
+# Seleccionar reglas básicas (Error, Pyflakes, etc.)
+select = ["E", "F", "W", "I"]
+# Ignorar errores de línea larga (E501) ya que Odoo suele tener arches XML largos
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# Ignorar imports no usados en los __init__.py (necesario en Odoo)
+"**/__init__.py" = ["F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

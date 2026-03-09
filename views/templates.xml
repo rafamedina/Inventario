@@ -23,7 +23,7 @@
                 <t t-foreach="docs" t-as="o">
                     <div class="page">
                         <div style="width: 100mm; height: 40mm; border: 1px dashed #ccc; padding: 5mm; margin-bottom: 10px;">
-                            
+
                             <table style="width: 100%; border-collapse: collapse; border: 0 !important;">
                                 <tr style="border: 0 !important;">
                                     <td style="vertical-align: middle; width: 60%; border: 0 !important; padding: 5px;">
@@ -32,8 +32,8 @@
                                         </div>
                                     </td>
                                     <td style="vertical-align: middle; width: 40%; text-align: right; border: 0 !important;">
-                                        <img t-if="o.qr_code" 
-                                            t-att-src="image_data_uri(o.qr_code)" 
+                                        <img t-if="o.qr_code"
+                                            t-att-src="image_data_uri(o.qr_code)"
                                             style="max-width: 30mm; max-height: 30mm; display: block; margin-left: auto;"/>
                                     </td>
                                 </tr>
