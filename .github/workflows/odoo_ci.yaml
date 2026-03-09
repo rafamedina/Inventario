@@ -1,4 +1,4 @@
-name: Odoo Module CI
+name: Odoo Module CI/CD Professional
 
 on:
   push:
@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   lint:
-    name: Lint with Ruff
+    name: 🔍 Lint (Ruff)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,137 +19,123 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.12"
-      - name: Install Ruff
-        run: pip install ruff
       - name: Run Ruff
-        run: ruff check .
+        run: |
+          pip install ruff
+          ruff check .
 
   build:
-    name: Build Docker Image
+    name: 🐳 Build & Export Image
     needs: lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Build and Load Image
+
+      - name: Build Test Image
         uses: docker/build-push-action@v5
         with:
           context: .
-          load: true
+          target: test
           tags: inventario:latest
+          outputs: type=docker,dest=/tmp/inventario.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: odoo-image
+          path: /tmp/inventario.tar
+          retention-days: 1
+
   unit-tests:
-    name: Unit Tests
+    name: 🔬 Unit Tests
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build Image (using cache)
-        uses: docker/build-push-action@v5
+      - name: Download Image
+        uses: actions/download-artifact@v4
         with:
-          context: .
-          load: true
-          tags: inventario:latest
-          cache-from: type=gha
-      - name: Run Unit Tests
+          name: odoo-image
+          path: /tmp
+
+      - name: Load Image into Docker
+        run: docker load < /tmp/inventario.tar
+
+      - name: Run Pytest (con pytest-odoo)
         run: |
-          echo "🚀 Starting Unit Tests..."
-          docker run inventario:latest pytest tests -m unit -v --tb=short --color=yes 2>&1 | tee /tmp/odoo_tests.log || true
+          echo "🚀 Ejecutando tests unitarios..."
+          # 💡 Definimos los parámetros de Odoo para que pytest-odoo inicialice el entorno
+          docker run --rm inventario:latest pytest tests -m unit -v --tb=short --color=yes \
+            --odoo-database=test_ci_unit \
+            --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,. \
+            2>&1 | tee /tmp/unit_tests.log || true
 
       - name: Analyze Results
         if: always()
         run: |
-          LOG="/tmp/odoo_tests.log"
-          echo ""
+          LOG="/tmp/unit_tests.log"
           echo "═══════════════════════════════════════════════"
           echo "           UNIT TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
-          SUMMARY=$(grep -E "==.*passed.*==" "$LOG" | tail -1)
-          if [ -n "$SUMMARY" ]; then echo "📊 $SUMMARY"; else echo "📊 No summary line found."; fi
-          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ All unit tests passed."; fi
-
-      - name: Upload Logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: unit-test-logs
-          path: /tmp/odoo_tests.log
+          grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary found"
+          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
 
   integration-tests:
-    name: Integration Tests
+    name: 🌐 Integration Tests
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build Image (using cache)
-        uses: docker/build-push-action@v5
+      - name: Download Image
+        uses: actions/download-artifact@v4
         with:
-          context: .
-          load: true
-          tags: inventario:latest
-          cache-from: type=gha
-      - name: Run Integration Tests
+          name: odoo-image
+          path: /tmp
+
+      - name: Load Image into Docker
+        run: docker load < /tmp/inventario.tar
+
+      - name: Run Pytest (con pytest-odoo)
         run: |
-          echo "🚀 Starting Integration Tests..."
-          docker run inventario:latest pytest tests -m integration -v --tb=short --color=yes 2>&1 | tee /tmp/odoo_tests.log || true
+          echo "🚀 Ejecutando tests de integración..."
+          # 💡 Los tests de integración necesitan Chrome, que ya está configurado en el Dockerfile
+          docker run --rm inventario:latest pytest tests -m integration -v --tb=short --color=yes \
+            --odoo-database=test_ci_int \
+            --odoo-addons-path=/usr/lib/python3/dist-packages/odoo/addons,. \
+            2>&1 | tee /tmp/int_tests.log || true
 
       - name: Analyze Results
         if: always()
         run: |
-          LOG="/tmp/odoo_tests.log"
-          echo ""
+          LOG="/tmp/int_tests.log"
           echo "═══════════════════════════════════════════════"
           echo "         INTEGRATION TESTS FINAL SUMMARY"
           echo "═══════════════════════════════════════════════"
           if [ ! -f "$LOG" ]; then echo "❌ No log found"; exit 1; fi
-          SUMMARY=$(grep -E "==.*passed.*==" "$LOG" | tail -1)
-          if [ -n "$SUMMARY" ]; then echo "📊 $SUMMARY"; fi
-          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ All integration tests passed."; fi
-
-      - name: Upload Logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-test-logs
-          path: /tmp/odoo_tests.log
+          grep -E "==.*passed.*==" "$LOG" || echo "📊 No summary found"
+          if grep -q "FAILED" "$LOG"; then exit 1; else echo "✅ PASSED"; fi
 
   promote-to-preprod:
-    name: Merge and Cleanup for Pre-Prod
+    name: 🔄 Sync & Clean Pre-Prod
     needs: [unit-tests, integration-tests]
     if: github.event_name == 'push' && success() && (github.ref == 'refs/heads/18.0-dev' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Branch
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Configure Git
+
+      - name: Force Sync Pre-Prod
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      - name: Checkout or Create Pre-Prod branch
-        run: git checkout 18.0-pre-prod || git checkout -b 18.0-pre-prod
-      - name: Merge Development into Pre-Prod
-        run: |
-          git merge origin/${{ github.ref_name }} --no-ff -X theirs -m "chore: auto-merge dev to pre-prod after tests [skip ci]"
-      - name: Clean up Non-App files
-        run: |
+          git checkout -B 18.0-pre-prod
           rm -rf tests/ conductor/ .github/
-          rm -f .pre-commit-config.yaml .ruff_cache/ Dockerfile pytest.ini comando.md pyproject.toml .gitignore
-          if [ -n "$(git status --porcelain)" ]; then
-            git add -A
-            git commit -m "chore: cleanup non-app files for pre-prod [skip ci]"
-          fi
-      - name: Push to Pre-Prod
-        run: git push origin 18.0-pre-prod
+          rm -f .pre-commit-config.yaml .ruff_cache/ Dockerfile pytest.ini pyproject.toml comando.md
+          git add -A
+          git commit -m "chore: production-ready cleanup [skip ci]" || echo "Sin cambios"
+          git push origin 18.0-pre-prod --force

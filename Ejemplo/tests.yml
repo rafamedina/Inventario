@@ -1,0 +1,385 @@
+name: Odoo CI/CD Pipeline
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+
+env:
+  ODOO_DB: test_ci_db
+  POSTGRES_USER: odoo
+  POSTGRES_PASSWORD: odoo
+  DOCKER_IMAGE: odoo-elearning-test
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Job 1: Lint (Ruff)
+  # ─────────────────────────────────────────────
+  lint:
+    name: 🔍 Lint (Ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Ruff
+        run: pip install ruff
+      - name: Run Ruff Linter
+        run: ruff check . --output-format=github
+
+  # ─────────────────────────────────────────────
+  # Job 2: Build Docker Image (shared)
+  # ─────────────────────────────────────────────
+  build:
+    name: 🐳 Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: test
+          tags: ${{ env.DOCKER_IMAGE }}:latest
+          outputs: type=docker,dest=/tmp/odoo-image.tar
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Gzip Image
+        run: gzip /tmp/odoo-image.tar
+
+      - name: Upload Docker Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp/odoo-image.tar.gz
+          retention-days: 1
+
+  # ─────────────────────────────────────────────
+  # Job 3: Unit Tests (auto-descubrimiento)
+  # ─────────────────────────────────────────────
+  test-unit:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Docker Image
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Load Docker Image
+        run: docker load < /tmp/odoo-image.tar.gz
+
+      - name: Run Unit Tests
+        run: |
+          if [ ! -d "tests" ]; then
+            echo "⚠️ No se detectó la carpeta 'tests'. Saltando pruebas unitarias (Clean Branch)."
+            exit 0
+          fi
+          docker run --rm --network host \
+            -e HOST=127.0.0.1 \
+            -e USER=${{ env.POSTGRES_USER }} \
+            -e PASSWORD=${{ env.POSTGRES_PASSWORD }} \
+            ${{ env.DOCKER_IMAGE }}:latest \
+            odoo \
+              --test-enable \
+              --stop-after-init \
+              --db_host=127.0.0.1 \
+              --db_user=${{ env.POSTGRES_USER }} \
+              --db_password=${{ env.POSTGRES_PASSWORD }} \
+              --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
+              -d ${{ env.ODOO_DB }}_unit \
+              -i elearning_universidad \
+              --test-tags=/elearning_universidad,-/elearning_universidad:TestUiPortal,-/elearning_universidad:TestControllers \
+              --log-level=test \
+              -c /dev/null \
+            2>&1 | tee /tmp/odoo_unit_tests.log
+
+      - name: Analyze Test Results
+        if: always()
+        run: |
+          echo "═══════════════════════════════════════════════"
+          echo "         ODOO UNIT TEST RESULTS ANALYSIS"
+          echo "═══════════════════════════════════════════════"
+
+          LOG="/tmp/odoo_unit_tests.log"
+          EXIT_CODE=0
+
+          # ── 1. Test Summary ──
+          echo ""
+          TOTAL_LINE=$(grep -oP "\d+ failed, \d+ error\(s\) of \d+ tests" "$LOG" | tail -1)
+          if [ -n "$TOTAL_LINE" ]; then
+            echo "📊 Test Summary: $TOTAL_LINE"
+          fi
+
+          # ── 2. List failed/errored test names ──
+          echo ""
+          echo "── Failed / Errored Tests ──"
+
+          FAIL_LINES=$(grep -P "(FAIL|ERROR): Test|ERROR: setUpClass" "$LOG" || true)
+
+          if [ -n "$FAIL_LINES" ]; then
+            echo "❌ DETECTED:"
+            echo "$FAIL_LINES" | grep -oP "(FAIL|ERROR): \S+" | sort -u
+            echo ""
+
+            echo "── Detailed Tracebacks ──"
+            awk '
+            / (ERROR|FAIL): Test/ || / ERROR: setUpClass/ {
+              printing = 1
+              print ""
+              print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              print $0
+              next
+            }
+            /^Traceback/ { printing = 1; print $0; next }
+            printing && /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] / { printing = 0; next }
+            printing { print $0 }
+            ' "$LOG"
+
+            EXIT_CODE=1
+          else
+            echo "✅ All tests passed."
+          fi
+
+          # ── 3. Log Level Summary ──
+          echo ""
+          echo "── Log Level Summary ──"
+
+          ERROR_COUNT=$(grep -c " ERROR " "$LOG" 2>/dev/null) || ERROR_COUNT=0
+          CRIT_COUNT=$(grep -c " CRITICAL " "$LOG" 2>/dev/null) || CRIT_COUNT=0
+
+          WARN_COUNT=$(grep " WARNING " "$LOG" \
+            | grep -v "child process was found" \
+            | grep -v "HTTPException" \
+            | grep -v "websocket-client" \
+            | grep -v "Chrome headless failed" \
+            | wc -l) || WARN_COUNT=0
+
+          if [ "$ERROR_COUNT" -gt 0 ]; then
+            echo "⚠️  ERROR entries: $ERROR_COUNT"
+            EXIT_CODE=1
+          fi
+          if [ "$CRIT_COUNT" -gt 0 ]; then
+            echo "🔴 CRITICAL entries: $CRIT_COUNT"
+            grep " CRITICAL " "$LOG"
+            EXIT_CODE=1
+          fi
+          if [ "$WARN_COUNT" -gt 0 ]; then
+            echo "⚡ WARNING entries: $WARN_COUNT"
+            grep " WARNING " "$LOG" \
+              | grep -v "child process was found" \
+              | grep -v "HTTPException" \
+              | grep -v "websocket-client" \
+              | grep -v "Chrome headless failed" \
+              | head -10
+          fi
+          if [ "$ERROR_COUNT" -eq 0 ] && [ "$CRIT_COUNT" -eq 0 ] && [ "$WARN_COUNT" -eq 0 ]; then
+            echo "✅ Clean logs."
+          fi
+
+          echo ""
+          echo "═══════════════════════════════════════════════"
+          echo "📋 Totals: Errors=$ERROR_COUNT | Critical=$CRIT_COUNT | Warnings=$WARN_COUNT"
+          echo "═══════════════════════════════════════════════"
+
+          exit $EXIT_CODE
+
+      - name: Upload Unit Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-logs
+          path: /tmp/odoo_unit_tests.log
+          retention-days: 7
+
+  # ─────────────────────────────────────────────
+  # Job 4: Integration Tests (HttpCase + Tours)
+  # ─────────────────────────────────────────────
+  test-integration:
+    name: 🌐 Integration Tests (HTTP + Tours)
+    runs-on: ubuntu-latest
+    needs: build
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Docker Image
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+          path: /tmp
+
+      - name: Load Docker Image
+        run: docker load < /tmp/odoo-image.tar.gz
+
+      - name: Run Integration Tests
+        run: |
+          docker run --rm --network host \
+            -e HOST=127.0.0.1 \
+            -e USER=${{ env.POSTGRES_USER }} \
+            -e PASSWORD=${{ env.POSTGRES_PASSWORD }} \
+            ${{ env.DOCKER_IMAGE }}:latest \
+            odoo \
+              --test-enable \
+              --stop-after-init \
+              --db_host=127.0.0.1 \
+              --db_user=${{ env.POSTGRES_USER }} \
+              --db_password=${{ env.POSTGRES_PASSWORD }} \
+              -d ${{ env.ODOO_DB }}_integration \
+              -i elearning_universidad \
+              --test-tags=/elearning_universidad:TestUiPortal,/elearning_universidad:TestControllers \
+              --log-level=test \
+              -c /dev/null \
+            2>&1 | tee /tmp/odoo_integration_tests.log
+
+      - name: Analyze Test Results
+        if: always()
+        run: |
+          echo "═══════════════════════════════════════════════"
+          echo "      ODOO INTEGRATION TEST RESULTS"
+          echo "═══════════════════════════════════════════════"
+
+          LOG="/tmp/odoo_integration_tests.log"
+          EXIT_CODE=0
+
+          # ── 1. Test Summary ──
+          echo ""
+          TOTAL_LINE=$(grep -oP "\d+ failed, \d+ error\(s\) of \d+ tests" "$LOG" | tail -1)
+          if [ -n "$TOTAL_LINE" ]; then
+            echo "📊 Test Summary: $TOTAL_LINE"
+          fi
+
+          # ── 2. List failed/errored tests ──
+          echo ""
+          echo "── Failed / Errored Tests ──"
+
+          FAIL_LINES=$(grep -P "(FAIL|ERROR): Test|ERROR: setUpClass" "$LOG" || true)
+
+          if [ -n "$FAIL_LINES" ]; then
+            echo "❌ DETECTED:"
+            echo "$FAIL_LINES" | grep -oP "(FAIL|ERROR): \S+" | sort -u
+            echo ""
+
+            echo "── Detailed Tracebacks ──"
+            awk '
+            / (ERROR|FAIL): Test/ || / ERROR: setUpClass/ {
+              printing = 1
+              print ""
+              print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+              print $0
+              next
+            }
+            /^Traceback/ { printing = 1; print $0; next }
+            printing && /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] / { printing = 0; next }
+            printing { print $0 }
+            ' "$LOG"
+
+            EXIT_CODE=1
+          else
+            echo "✅ All tests passed."
+          fi
+
+          # ── 3. Tour failures ──
+          echo ""
+          echo "── Tour Failures ──"
+          TOUR_FAILS=$(grep "FAILED:" "$LOG" || true)
+          if [ -n "$TOUR_FAILS" ]; then
+            echo "❌ TOUR FAILURES:"
+            echo "$TOUR_FAILS"
+            grep -A5 "FAILED:" "$LOG" || true
+            EXIT_CODE=1
+          else
+            echo "✅ No tour failures."
+          fi
+
+          # ── 4. Log Level Summary ──
+          echo ""
+          echo "── Log Level Summary ──"
+
+          ERROR_COUNT=$(grep -c " ERROR " "$LOG" 2>/dev/null) || ERROR_COUNT=0
+          CRIT_COUNT=$(grep -c " CRITICAL " "$LOG" 2>/dev/null) || CRIT_COUNT=0
+
+          WARN_COUNT=$(grep " WARNING " "$LOG" \
+            | grep -v "child process was found" \
+            | grep -v "HTTPException" \
+            | grep -v "websocket-client" \
+            | grep -v "Chrome headless failed" \
+            | wc -l) || WARN_COUNT=0
+
+          if [ "$ERROR_COUNT" -gt 0 ]; then
+            echo "⚠️  ERROR entries: $ERROR_COUNT"
+            EXIT_CODE=1
+          fi
+          if [ "$CRIT_COUNT" -gt 0 ]; then
+            echo "🔴 CRITICAL entries: $CRIT_COUNT"
+            grep " CRITICAL " "$LOG"
+            EXIT_CODE=1
+          fi
+          if [ "$WARN_COUNT" -gt 0 ]; then
+            echo "⚡ WARNING entries: $WARN_COUNT"
+            grep " WARNING " "$LOG" \
+              | grep -v "child process was found" \
+              | grep -v "HTTPException" \
+              | grep -v "websocket-client" \
+              | grep -v "Chrome headless failed" \
+              | head -10
+          fi
+          if [ "$ERROR_COUNT" -eq 0 ] && [ "$CRIT_COUNT" -eq 0 ] && [ "$WARN_COUNT" -eq 0 ]; then
+            echo "✅ Clean logs."
+          fi
+
+          echo ""
+          echo "═══════════════════════════════════════════════"
+          echo "📋 Totals: Errors=$ERROR_COUNT | Critical=$CRIT_COUNT | Warnings=$WARN_COUNT"
+          echo "═══════════════════════════════════════════════"
+
+          exit $EXIT_CODE
+
+      - name: Upload Integration Test Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-logs
+          path: /tmp/odoo_integration_tests.log
+          retention-days: 7

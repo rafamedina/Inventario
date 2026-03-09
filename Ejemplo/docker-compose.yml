@@ -1,0 +1,65 @@
+## Entorno de Desarrollo Local — Persistente
+## Simula producción: Odoo 18 + PostgreSQL con datos que sobreviven al reinicio.
+## El módulo se monta como volumen → cambios en código sin rebuild.
+##
+## Uso:
+##   ./scripts/run-dev.sh              → Inicia (o actualiza) el entorno
+##   ./scripts/run-dev.sh stop         → Para sin borrar datos
+##   ./scripts/run-dev.sh reset        → Para y borra toda la base de datos
+##   ./scripts/run-dev.sh logs         → Ver logs en tiempo real
+##   ./scripts/run-dev.sh update       → Actualizar módulo sin reiniciar BD
+##
+## AISLAMIENTO: Este compose usa el proyecto 'elearning-dev', completamente
+## separado del entorno de tests ('elearning-test'). Se pueden ejecutar en paralelo.
+
+name: elearning-dev
+
+services:
+  db:
+    image: postgres:15
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: odoo
+      POSTGRES_DB: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  odoo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: test
+    ports:
+      - "8069:8069"
+      - "8072:8072"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - HOST=db
+      - PORT=5432
+      - USER=odoo
+      - PASSWORD=odoo
+    volumes:
+      # Módulo montado como volumen → cambios en código sin rebuild
+      - .:/mnt/extra-addons/elearning_universidad
+      # Persistir filestore de Odoo
+      - odoo-data:/var/lib/odoo
+    command: >
+      odoo
+        --db_host=db
+        --db_port=5432
+        --db_user=odoo
+        --db_password=odoo
+        --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+
+volumes:
+  pgdata:
+  odoo-data:
