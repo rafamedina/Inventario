@@ -16,8 +16,3 @@
 
 - [x] **Track: Track Maintenance Changes in Asset Form**
       _Link: [./tracks/track_maintenance_changes_20260310/](./tracks/track_maintenance_changes_20260310/)_
-
----
-
-- [x] **Track: Plan Duplication with Checks and Alerts**
-      _Link: [./tracks/plan_duplication_20260310/](./tracks/plan_duplication_20260310/)_
