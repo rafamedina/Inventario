@@ -10,7 +10,7 @@ on:
 env:
   ODOO_DB: test_ci_db
   POSTGRES_USER: odoo
-  POSTGRES_PASSWORD: odoo
+  POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
   DOCKER_IMAGE: odoo-inventario-test
 
 permissions:
@@ -78,7 +78,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U odoo"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -157,7 +157,7 @@ jobs:
         ports:
           - 5432:5432
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U odoo"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -176,6 +176,8 @@ jobs:
             -e HOST=127.0.0.1 \
             -e USER=${{ env.POSTGRES_USER }} \
             -e PASSWORD=${{ env.POSTGRES_PASSWORD }} \
+            -e ODOO_CHROME_BIN=/usr/bin/chromium-browser \
+            -e ODOO_CHROME_TIMEOUT=120 \
             ${{ env.DOCKER_IMAGE }}:latest \
             odoo \
               --test-enable \
@@ -183,6 +185,7 @@ jobs:
               --db_host=127.0.0.1 \
               --db_user=${{ env.POSTGRES_USER }} \
               --db_password=${{ env.POSTGRES_PASSWORD }} \
+              --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons \
               -d ${{ env.ODOO_DB }}_int \
               -i Inventario \
               --test-tags=ui \
@@ -237,9 +240,20 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Crear tag único para esta promoción
+          TAG_NAME="v18.0-build-${{ github.run_number }}"
+          echo "Promoting to Pre-Prod with tag: $TAG_NAME"
+
           git checkout -B 18.0-pre-prod
           rm -rf .agents/ tests/ conductor/ .github/ .ruff_cache/ Ejemplo/ scripts/
           rm -f skills-lock.json .gitignore .pre-commit-config.yaml Dockerfile pytest.ini pyproject.toml requirements.txt image.png
           git add -A
           git commit -m "build: clean staging release [skip ci]" || echo "No changes"
+
+          # Crear tag en el commit de pre-prod
+          git tag $TAG_NAME
+
+          # Push branch y tag
           git push origin 18.0-pre-prod --force
+          git push origin $TAG_NAME --force
