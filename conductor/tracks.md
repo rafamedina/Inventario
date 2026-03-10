@@ -10,4 +10,4 @@
 ---
 
 - [x] **Track: Create comprehensive Diátaxis-based documentation**
-*Link: [./tracks/module_documentation_20260310/](./tracks/module_documentation_20260310/)*
+      _Link: [./tracks/module_documentation_20260310/](./tracks/module_documentation_20260310/)_

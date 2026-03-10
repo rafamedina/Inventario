@@ -9,22 +9,27 @@ Welcome to the documentation for the Wavext Asset Inventory module. This guide i
 This tutorial will guide you through setting up the module and creating your first asset record.
 
 ### Prerequisites
+
 - **Odoo 18** environment (Docker-based recommended).
 - Python library `qrcode` installed in your Odoo environment.
 - Access to an Odoo database with the `hr` and `hr_skills` modules installed.
 
 ### Step 1: Module Installation
+
 1. Place the `Inventario` folder in your Odoo `addons` directory.
 2. Update the app list in Odoo (Enable Developer Mode -> Apps -> Update App List).
 3. Search for "Modulo de inventario de Wavext" and click **Activate**.
 
 ### Step 2: Initial Configuration
+
 Before creating assets, you must define the classification structure:
+
 1. Navigate to **Asset Management > Configuration > Categories**. Create a category (e.g., "Hardware", Code: "HW").
 2. Go to **Subcategories**. Create a subcategory linked to "Hardware" (e.g., "Laptop", Code: "LP").
 3. Go to **Locations**. Create a location (e.g., "Main Office", Code: "OFF").
 
 ### Step 3: Creating Your First Asset
+
 1. Go to **Asset Management > Operations > Inventory**.
 2. Click **New**.
 3. Fill in the **Name** (e.g., "Developer Laptop 01").
@@ -38,12 +43,14 @@ Before creating assets, you must define the classification structure:
 Practical recipes for common developer and administrator tasks.
 
 ### How to Assign an Asset to an Employee
+
 1. Open the Asset form.
 2. In the **Responsible and Owner** section, ensure "Type of Responsible" is set to "Employee".
 3. Select the employee in the **Responsible (Employee)** field.
 4. Save. The system will automatically record this in the **Assignment History** tab and the employee's profile will now show this asset.
 
 ### How to Start a Maintenance Process
+
 1. Ensure the asset has a **Maintenance Plan** assigned in the "Technical Details" tab.
 2. Click the **Start Maintenance** button in the header.
 3. The status will change to "In Progress", and a "Maintenance ACTIVE" tab will appear.
@@ -51,6 +58,7 @@ Practical recipes for common developer and administrator tasks.
 5. Click **Finish Maintenance** to move the record to history and update the next maintenance date.
 
 ### How to Print Asset Labels
+
 1. Open any Asset record.
 2. Click the **Print ID** button in the header.
 3. A PDF report will be generated containing the Asset Name, ID, and the QR code for physical labeling.
@@ -93,20 +101,22 @@ Technical dictionary for developers.
 
 ### Core Models
 
-| Model Name | Description | Key Fields |
-| :--- | :--- | :--- |
-| `inventory.asset` | Main asset record. | `nombre`, `identificador_final`, `qr_code`, `plan_id` |
-| `inventory.category` | Classification grouping. | `nombre`, `codigo` |
-| `plans.asset` | Maintenance template. | `periodicidad`, `tarea_ids` |
-| `inventory.asset.maintenance` | Instance of a maintenance work. | `state`, `checklist_line_ids` |
-| `hr.employee` | Odoo standard employee (Extended). | `current_responsible_asset_ids` |
+| Model Name                    | Description                        | Key Fields                                            |
+| :---------------------------- | :--------------------------------- | :---------------------------------------------------- |
+| `inventory.asset`             | Main asset record.                 | `nombre`, `identificador_final`, `qr_code`, `plan_id` |
+| `inventory.category`          | Classification grouping.           | `nombre`, `codigo`                                    |
+| `plans.asset`                 | Maintenance template.              | `periodicidad`, `tarea_ids`                           |
+| `inventory.asset.maintenance` | Instance of a maintenance work.    | `state`, `checklist_line_ids`                         |
+| `hr.employee`                 | Odoo standard employee (Extended). | `current_responsible_asset_ids`                       |
 
 ### Security & Permissions
+
 - **Category:** Gestión de Inventario
 - **Group:** `group_inventory_manager` (Inventory / Full Access).
 - **Rights:** This group has full CRUD permissions on all inventory-related models via `security/ir.model.access.csv`. `base.user_admin` is a member by default.
 
 ### Dependencies
+
 - `base`: Core Odoo framework.
 - `hr`: Employee management.
 - `hr_skills`: Employee reporting.
@@ -119,12 +129,15 @@ Technical dictionary for developers.
 Understanding the system architecture.
 
 ### Asset Traceability Logic
+
 Every time an asset is assigned to a different employee, the `inventory.asset.history` model records the change. This is triggered by an `@api.onchange` or write operation on the `responsable_empleado_id` field. This ensures a complete audit trail of who had what equipment and when.
 
 ### QR Code Generation
+
 QR codes are computed dynamically when the `identificador_final` changes. The system uses the Python `qrcode` library to generate a PNG image, which is then base64-encoded and stored in the `qr_code` Binary field. This code points to the direct Odoo URL of the asset form, allowing for quick physical audits.
 
 ### Maintenance Lifecycle
+
 The maintenance system is decoupled into **Plans** (templates) and **Maintenances** (executions). When a maintenance starts, a new instance is created that copies the tasks from the assigned plan. This allows for specific adjustments to a maintenance instance without affecting the global template.
 
 ---
