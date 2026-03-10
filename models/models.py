@@ -173,7 +173,7 @@ class InventoryAssetMaintenance(models.Model):
     fecha_inicio = fields.Date(string="Fecha de Inicio", default=fields.Date.today(), tracking=True)
     fecha_fin = fields.Date(string="Fecha de Finalización", readonly=True, tracking=True)
 
-    notas_generales = fields.Text(string="Notas Generales")
+    notas_generales = fields.Text(string="Notas Generales", tracking=True)
 
     state = fields.Selection(
         [("in_progress", "En Proceso"), ("done", "Realizado")],
@@ -199,7 +199,10 @@ class InventoryAssetMaintenance(models.Model):
                 new_note = vals["notas_generales"] or "vacio"
                 msg = f"Notas Generales cambiadas de '{old_note}' a '{new_note}'"
 
-                # ONLY Post to asset record
+                # Post to THIS record chatter
+                record.message_post(body=msg)
+
+                # Post to asset record
                 if record.asset_id:
                     asset_msg = f"Mantenimiento ({record.display_name}): {msg}"
                     record.asset_id.message_post(body=asset_msg)
@@ -224,7 +227,7 @@ class InventoryAssetMaintenanceLine(models.Model):
     notes = fields.Char(string="Notas adicionales", tracking=True)
 
     def write(self, vals):
-        # Post ONLY to asset chatter if notes or image changed
+        # Post to parent maintenance AND asset chatter if notes or image changed
         for record in self:
             changes = []
             if "notes" in vals:
@@ -234,10 +237,15 @@ class InventoryAssetMaintenanceLine(models.Model):
             if "image" in vals:
                 changes.append(f"Se ha actualizado la imagen de la tarea '{record.name}'")
 
-            if changes and record.maintenance_id and record.maintenance_id.asset_id:
+            if changes and record.maintenance_id:
                 msg = " | ".join(changes)
-                asset_msg = f"Mantenimiento ({record.maintenance_id.display_name}): {msg}"
-                record.maintenance_id.asset_id.message_post(body=asset_msg)
+                # Post to maintenance record chatter
+                record.maintenance_id.message_post(body=msg)
+
+                # Post to asset record
+                if record.maintenance_id.asset_id:
+                    asset_msg = f"Mantenimiento ({record.maintenance_id.display_name}): {msg}"
+                    record.maintenance_id.asset_id.message_post(body=asset_msg)
 
         return super(InventoryAssetMaintenanceLine, self).write(vals)
 
