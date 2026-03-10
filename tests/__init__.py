@@ -11,4 +11,5 @@ from . import (
     test_qr_relocation,
     test_security_groups,
     test_subcategory_link,
+    test_maintenance_chatter,
 )

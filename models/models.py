@@ -173,6 +173,8 @@ class InventoryAssetMaintenance(models.Model):
     fecha_inicio = fields.Date(string="Fecha de Inicio", default=fields.Date.today(), tracking=True)
     fecha_fin = fields.Date(string="Fecha de Finalización", readonly=True, tracking=True)
 
+    notas_generales = fields.Text(string="Notas Generales")
+
     state = fields.Selection(
         [("in_progress", "En Proceso"), ("done", "Realizado")],
         string="Estado",
@@ -190,6 +192,19 @@ class InventoryAssetMaintenance(models.Model):
             plan_name = rec.plan_id.nombre if rec.plan_id else "Mantenimiento"
             rec.display_name = f"{plan_name} - {rec.asset_id.nombre} ({rec.fecha_inicio})"
 
+    def write(self, vals):
+        if "notas_generales" in vals:
+            for record in self:
+                old_note = record.notas_generales or "vacio"
+                new_note = vals["notas_generales"] or "vacio"
+                msg = f"Notas Generales cambiadas de '{old_note}' a '{new_note}'"
+                
+                # ONLY Post to asset record
+                if record.asset_id:
+                    asset_msg = f"Mantenimiento ({record.display_name}): {msg}"
+                    record.asset_id.message_post(body=asset_msg)
+        return super(InventoryAssetMaintenance, self).write(vals)
+
     def unlink(self):
         for record in self:
             if record.state == "done" and not self.env.user.has_group("base.group_erp_manager"):
@@ -200,12 +215,31 @@ class InventoryAssetMaintenance(models.Model):
 class InventoryAssetMaintenanceLine(models.Model):
     _name = "inventory.asset.maintenance.line"
     _description = "Línea de Checklist de Mantenimiento"
+    _inherit = ["mail.thread", "mail.activity.mixin"]
 
     maintenance_id = fields.Many2one("inventory.asset.maintenance", string="Mantenimiento", ondelete="cascade")
-    name = fields.Char(string="Tarea", required=True)
-    is_done = fields.Boolean(string="Hecho", default=False)
+    name = fields.Char(string="Tarea", required=True, tracking=True)
+    is_done = fields.Boolean(string="Hecho", default=False, tracking=True)
     image = fields.Binary(string="Imagen / Evidencia")
-    notes = fields.Char(string="Notas adicionales")
+    notes = fields.Char(string="Notas adicionales", tracking=True)
+
+    def write(self, vals):
+        # Post ONLY to asset chatter if notes or image changed
+        for record in self:
+            changes = []
+            if "notes" in vals:
+                old_note = record.notes or "vacio"
+                new_note = vals["notes"] or "vacio"
+                changes.append(f"Notas de '{record.name}' cambiadas de '{old_note}' a '{new_note}'")
+            if "image" in vals:
+                changes.append(f"Se ha actualizado la imagen de la tarea '{record.name}'")
+            
+            if changes and record.maintenance_id and record.maintenance_id.asset_id:
+                msg = " | ".join(changes)
+                asset_msg = f"Mantenimiento ({record.maintenance_id.display_name}): {msg}"
+                record.maintenance_id.asset_id.message_post(body=asset_msg)
+        
+        return super(InventoryAssetMaintenanceLine, self).write(vals)
 
 
 # ==========================================
