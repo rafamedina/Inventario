@@ -239,7 +239,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git checkout -B 18.0-pre-prod
           rm -rf tests/ conductor/ .github/ .ruff_cache/ Ejemplo/ scripts/
-          rm -f .gitignore .pre-commit-config.yaml Dockerfile pytest.ini pyproject.toml requirements.txt image.png
+          rm -f skills-lock.json .gitignore .pre-commit-config.yaml Dockerfile pytest.ini pyproject.toml requirements.txt image.png
           git add -A
           git commit -m "build: clean staging release [skip ci]" || echo "No changes"
           git push origin 18.0-pre-prod --force

@@ -127,9 +127,6 @@ QR codes are computed dynamically when the `identificador_final` changes. The sy
 ### Maintenance Lifecycle
 The maintenance system is decoupled into **Plans** (templates) and **Maintenances** (executions). When a maintenance starts, a new instance is created that copies the tasks from the assigned plan. This allows for specific adjustments to a maintenance instance without affecting the global template.
 
-### Conductor Development Framework
-This module is developed using **Conductor**, a track-based development cycle. Each feature or fix is developed in an isolated "Track" with its own specification (`spec.md`) and plan (`plan.md`). This ensures traceability of all code changes back to their initial requirements.
-
 ---
 
 ## 5. Visuals

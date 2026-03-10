@@ -127,9 +127,6 @@ Los códigos QR se calculan dinámicamente cuando cambia el `identificador_final
 ### Ciclo de Vida del Mantenimiento
 El sistema de mantenimiento está desacoplado en **Planes** (plantillas) y **Mantenimientos** (ejecuciones). Cuando comienza un mantenimiento, se crea una nueva instancia que copia las tareas del plan asignado. Esto permite ajustes específicos en una instancia de mantenimiento sin afectar a la plantilla global.
 
-### Marco de Desarrollo Conductor
-Este módulo se desarrolla utilizando **Conductor**, un ciclo de desarrollo basado en tracks. Cada característica o corrección se desarrolla en un "Track" aislado con su propia especificación (`spec.md`) y plan (`plan.md`). Esto asegura la trazabilidad de todos los cambios de código hasta sus requisitos iniciales.
-
 ---
 
 ## 5. Visuales

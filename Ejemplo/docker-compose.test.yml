@@ -9,10 +9,10 @@
 ## Los tests se auto-descubren: cualquier test registrado en tests/__init__.py
 ## se ejecuta automáticamente sin necesidad de listar clases manualmente.
 ##
-## AISLAMIENTO: Este compose usa el proyecto 'elearning-test', completamente
-## separado del entorno de desarrollo ('elearning-dev'). Se pueden ejecutar en paralelo.
+## AISLAMIENTO: Este compose usa el proyecto 'Inventario-test', completamente
+## separado del entorno de desarrollo ('Inventario-dev'). Se pueden ejecutar en paralelo.
 
-name: elearning-test
+name: Inventario-test
 
 services:
   db:
