@@ -172,15 +172,11 @@ class PlansAsset(models.Model):
 
         # Prepare tarea_ids for deep copy
         if "tarea_ids" not in default:
-            default["tarea_ids"] = [
-                (0, 0, {"name": task.name}) for task in self.tarea_ids
-            ]
+            default["tarea_ids"] = [(0, 0, {"name": task.name}) for task in self.tarea_ids]
 
         # Prepare alerta_ids for deep copy
         if "alerta_ids" not in default:
-            default["alerta_ids"] = [
-                (0, 0, {"valor": alert.valor, "unidad": alert.unidad}) for alert in self.alerta_ids
-            ]
+            default["alerta_ids"] = [(0, 0, {"valor": alert.valor, "unidad": alert.unidad}) for alert in self.alerta_ids]
 
         return super(PlansAsset, self).copy(default=default)
 

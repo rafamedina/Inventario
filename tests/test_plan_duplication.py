@@ -40,31 +40,17 @@ class TestPlanDuplication(common.TransactionCase):
         self.assertEqual(duplicated_plan.subcategoria_id.id, self.original_plan.subcategoria_id.id)
 
         # Verify tasks are duplicated (Current failing behavior: they are likely empty)
-        self.assertEqual(
-            len(duplicated_plan.tarea_ids),
-            len(self.original_plan.tarea_ids),
-            "Maintenance tasks should have been duplicated"
-        )
+        self.assertEqual(len(duplicated_plan.tarea_ids), len(self.original_plan.tarea_ids), "Maintenance tasks should have been duplicated")
         original_task_names = sorted(self.original_plan.tarea_ids.mapped("name"))
         duplicated_task_names = sorted(duplicated_plan.tarea_ids.mapped("name"))
         self.assertEqual(duplicated_task_names, original_task_names)
 
         # Verify alerts are duplicated
-        self.assertEqual(
-            len(duplicated_plan.alerta_ids),
-            len(self.original_plan.alerta_ids),
-            "Alerts should have been duplicated"
-        )
+        self.assertEqual(len(duplicated_plan.alerta_ids), len(self.original_plan.alerta_ids), "Alerts should have been duplicated")
         original_alert_vals = sorted(self.original_plan.alerta_ids.mapped("valor"))
         duplicated_alert_vals = sorted(duplicated_plan.alerta_ids.mapped("valor"))
         self.assertEqual(duplicated_alert_vals, original_alert_vals)
 
         # Ensure they are new records, not the same ones
-        self.assertNotEqual(
-            set(duplicated_plan.tarea_ids.ids),
-            set(self.original_plan.tarea_ids.ids)
-        )
-        self.assertNotEqual(
-            set(duplicated_plan.alerta_ids.ids),
-            set(self.original_plan.alerta_ids.ids)
-        )
+        self.assertNotEqual(set(duplicated_plan.tarea_ids.ids), set(self.original_plan.tarea_ids.ids))
+        self.assertNotEqual(set(duplicated_plan.alerta_ids.ids), set(self.original_plan.alerta_ids.ids))
