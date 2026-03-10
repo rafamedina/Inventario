@@ -10,14 +10,14 @@
 - [x] Task: Update the Python models to enable tracking on `notes` and `image` fields in `inventory.asset.maintenance.line`.
 - [x] Task: Ensure the parent `inventory.asset.maintenance` record is also configured to support chatter (inherit `mail.thread`).
 - [x] Task: Run tests and confirm that changes are now logged in the chatter.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Backend Implementation - Field Tracking' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Backend Implementation - Field Tracking' (Protocol in workflow.md)
 
 ## Phase 3: UI Implementation - Editable History
 - [x] Task: Update the XML view for the Asset form to make the maintenance history list editable even when the maintenance is 'done'.
 - [x] Task: Specifically ensure that `notes` and `image` fields are editable within the list view inside the Asset form.
 - [x] Task: Verify in the UI that an Inventory Manager can modify these fields from the "Maintenance History" tab.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation - Editable History' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI Implementation - Editable History' (Protocol in workflow.md)
 
 ## Phase 4: Final Review and Checkpointing
-- [~] Task: Perform a final manual verification to confirm that changes to archived records are properly logged in the chatter.
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: Final Review and Checkpointing' (Protocol in workflow.md)
+- [x] Task: Perform a final manual verification to confirm that changes to archived records are properly logged in the chatter.
+- [x] Task: Conductor - User Manual Verification 'Phase 4: Final Review and Checkpointing' (Protocol in workflow.md)
