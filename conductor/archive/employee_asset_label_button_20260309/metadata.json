@@ -1,8 +1,0 @@
-{
-  "track_id": "employee_asset_label_button_20260309",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-03-09T10:00:00Z",
-  "updated_at": "2026-03-09T10:00:00Z",
-  "description": "quiero añadir en el modulo inventario una Bloque de la Etiqueta: que redirija a al perfil que hemos creado de que activo tiene cada usuario, quiero que se haga todo desde nuestro modulo, si es posible no tocar el modulo de inventario original"
-}

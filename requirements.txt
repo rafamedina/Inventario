@@ -1,2 +1,0 @@
-# Este archivo está vacío porque Odoo 18 ya trae las dependencias necesarias.
-# Las herramientas de test se instalan directamente en el Dockerfile/CI.
