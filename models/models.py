@@ -158,6 +158,10 @@ class PlansAsset(models.Model):
         return super(PlansAsset, self).create(vals_list)
 
     def copy(self, default=None):
+        """
+        Overrides the standard copy method to ensure related maintenance tasks
+        (tarea_ids) and alerts (alerta_ids) are duplicated alongside the plan.
+        """
         default = dict(default or {})
         if "nombre" not in default:
             default["nombre"] = self.nombre + " (copy)"
