@@ -9,6 +9,7 @@ from . import (
     test_maintenance_chatter,
     test_maintenance_checklists,
     test_maintenance_lifecycle,
+    test_plan_duplication,
     test_qr_relocation,
     test_security_groups,
     test_subcategory_link,

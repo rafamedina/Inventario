@@ -157,6 +157,29 @@ class PlansAsset(models.Model):
                 vals["identificador"] = self.env["ir.sequence"].next_by_code("plans.asset.sequence") or "Nuevo"
         return super(PlansAsset, self).create(vals_list)
 
+    def copy(self, default=None):
+        default = dict(default or {})
+        if "nombre" not in default:
+            default["nombre"] = self.nombre + " (copy)"
+
+        # Set identifier to 'Nuevo' so it gets a new sequence number in create()
+        if "identificador" not in default:
+            default["identificador"] = "Nuevo"
+
+        # Prepare tarea_ids for deep copy
+        if "tarea_ids" not in default:
+            default["tarea_ids"] = [
+                (0, 0, {"name": task.name}) for task in self.tarea_ids
+            ]
+
+        # Prepare alerta_ids for deep copy
+        if "alerta_ids" not in default:
+            default["alerta_ids"] = [
+                (0, 0, {"valor": alert.valor, "unidad": alert.unidad}) for alert in self.alerta_ids
+            ]
+
+        return super(PlansAsset, self).copy(default=default)
+
 
 # ==========================================
 # NUEVOS MODELOS DE SEGUIMIENTO (CHECKLIST E HISTORIAL)

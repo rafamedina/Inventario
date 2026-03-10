@@ -19,5 +19,5 @@
 
 ---
 
-- [ ] **Track: Plan Duplication with Checks and Alerts**
+- [~] **Track: Plan Duplication with Checks and Alerts**
       _Link: [./tracks/plan_duplication_20260310/](./tracks/plan_duplication_20260310/)_
