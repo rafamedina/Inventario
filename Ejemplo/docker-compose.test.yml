@@ -31,12 +31,17 @@ services:
 
   odoo-test-unit:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: Ejemplo/Dockerfile
       target: test
     depends_on:
       db:
         condition: service_healthy
+    # Configuración de tmpfs con permisos para el usuario 'odoo' (uid: 101)
+    tmpfs:
+      - /var/lib/odoo:size=256M,uid=101,gid=101,mode=777
+    volumes:
+      - ..:/mnt/extra-addons/Inventario
     command: >
       odoo
         --db_host=db
@@ -44,24 +49,30 @@ services:
         --db_user=odoo
         --db_password=odoo
         --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
-        -d test_unit
-        -i elearning_universidad
+        -d test_db
+        -i Inventario
         --test-enable
         --stop-after-init
+        --no-http
         --log-level=test
-        --test-tags=/elearning_universidad,-/elearning_universidad:TestUiPortal,-/elearning_universidad:TestControllers
+        --test-tags=/Inventario,-/Inventario:TestUiPortal,-/Inventario:TestControllers
         --max-cron-threads=0
 
   odoo-test-integration:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: Ejemplo/Dockerfile
       target: test
     depends_on:
       db:
         condition: service_healthy
+    # Configuración de tmpfs con permisos para el usuario 'odoo' (uid: 101)
+    tmpfs:
+      - /var/lib/odoo:size=256M,uid=101,gid=101,mode=777
     environment:
       - ODOO_CHROME_TIMEOUT=120
+    volumes:
+      - ..:/mnt/extra-addons/Inventario
     command: >
       odoo
         --db_host=db
@@ -69,10 +80,10 @@ services:
         --db_user=odoo
         --db_password=odoo
         --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
-        -d test_integration
-        -i elearning_universidad
+        -d test_db
+        -u Inventario
         --test-enable
         --stop-after-init
         --log-level=test
-        --test-tags=/elearning_universidad:TestUiPortal,/elearning_universidad:TestControllers
+        --test-tags=/Inventario:TestUiPortal,/Inventario:TestControllers
         --max-cron-threads=0

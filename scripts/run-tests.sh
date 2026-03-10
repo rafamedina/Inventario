@@ -1,6 +1,6 @@
 #!/bin/bash
 # ──────────────────────────────────────────────
-#  🧪 Ejecutar Tests en Docker Local (Efímero)
+#  🧪 Ejecutar Tests en Docker Local (Efímero) — Inventario
 # ──────────────────────────────────────────────
 # Uso:
 #   ./scripts/run-tests.sh          → Todos los tests
@@ -8,14 +8,13 @@
 #   ./scripts/run-tests.sh int      → Solo integration tests (HTTP + Tours JS)
 #
 # Los tests se auto-descubren desde tests/__init__.py.
-# No necesitas listar clases manualmente.
 # Al terminar, los contenedores se eliminan automáticamente.
 # ──────────────────────────────────────────────
 
 set -e
 
-COMPOSE_FILE="docker-compose.test.yml"
-PROJECT="elearning-test"
+COMPOSE_FILE="Ejemplo/docker-compose.test.yml"
+PROJECT="inventario-test"
 MODE="${1:-all}"
 
 # Asegurar limpieza incluso si el script falla

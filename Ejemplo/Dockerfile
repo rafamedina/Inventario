@@ -36,8 +36,8 @@ RUN printf '#!/bin/bash\nexec google-chrome-stable --no-sandbox --disable-gpu --
 RUN pip3 install --no-cache-dir --break-system-packages websocket-client
 
 # Copiamos todo el módulo (incluyendo tests y docs para esta etapa)
-COPY . /mnt/extra-addons/elearning_universidad
-RUN chown -R odoo:odoo /mnt/extra-addons/elearning_universidad
+COPY . /mnt/extra-addons/Inventario
+RUN chown -R odoo:odoo /mnt/extra-addons/Inventario
 
 USER odoo
 
@@ -46,14 +46,14 @@ FROM base AS prod
 USER root
 
 # Copiamos solo el código necesario (el .dockerignore se encarga de filtrar)
-COPY . /mnt/extra-addons/elearning_universidad
+COPY . /mnt/extra-addons/Inventario
 
 # Limpieza manual extra por seguridad
-RUN rm -rf /mnt/extra-addons/elearning_universidad/tests \
-    && rm -rf /mnt/extra-addons/elearning_universidad/docs \
-    && rm -rf /mnt/extra-addons/elearning_universidad/conductor \
-    && rm -rf /mnt/extra-addons/elearning_universidad/.github
+RUN rm -rf /mnt/extra-addons/Inventario/tests \
+    && rm -rf /mnt/extra-addons/Inventario/docs \
+    && rm -rf /mnt/extra-addons/Inventario/conductor \
+    && rm -rf /mnt/extra-addons/Inventario/.github
 
-RUN chown -R odoo:odoo /mnt/extra-addons/elearning_universidad
+RUN chown -R odoo:odoo /mnt/extra-addons/Inventario
 
 USER odoo

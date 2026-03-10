@@ -33,8 +33,8 @@ services:
 
   odoo:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ..
+      dockerfile: Ejemplo/Dockerfile
       target: test
     ports:
       - "8069:8069"
@@ -49,7 +49,7 @@ services:
       - PASSWORD=odoo
     volumes:
       # Módulo montado como volumen → cambios en código sin rebuild
-      - .:/mnt/extra-addons/elearning_universidad
+      - ..:/mnt/extra-addons/Inventario
       # Persistir filestore de Odoo
       - odoo-data:/var/lib/odoo
     command: >
