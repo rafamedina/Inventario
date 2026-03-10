@@ -198,7 +198,7 @@ class InventoryAssetMaintenance(models.Model):
                 old_note = record.notas_generales or "vacio"
                 new_note = vals["notas_generales"] or "vacio"
                 msg = f"Notas Generales cambiadas de '{old_note}' a '{new_note}'"
-                
+
                 # ONLY Post to asset record
                 if record.asset_id:
                     asset_msg = f"Mantenimiento ({record.display_name}): {msg}"
@@ -233,12 +233,12 @@ class InventoryAssetMaintenanceLine(models.Model):
                 changes.append(f"Notas de '{record.name}' cambiadas de '{old_note}' a '{new_note}'")
             if "image" in vals:
                 changes.append(f"Se ha actualizado la imagen de la tarea '{record.name}'")
-            
+
             if changes and record.maintenance_id and record.maintenance_id.asset_id:
                 msg = " | ".join(changes)
                 asset_msg = f"Mantenimiento ({record.maintenance_id.display_name}): {msg}"
                 record.maintenance_id.asset_id.message_post(body=asset_msg)
-        
+
         return super(InventoryAssetMaintenanceLine, self).write(vals)
 
 

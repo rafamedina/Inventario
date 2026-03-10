@@ -1,5 +1,6 @@
-from odoo.tests import common
 from odoo import fields
+from odoo.tests import common
+
 
 class TestMaintenanceChatter(common.TransactionCase):
     def setUp(self):
@@ -16,27 +17,33 @@ class TestMaintenanceChatter(common.TransactionCase):
         self.subcat = self.Subcategory.create({"nombre": "TEST", "codigo": "T", "categoria_id": self.cat.id})
         self.loc = self.Location.create({"nombre": "TEST", "codigo": "T"})
 
-        self.asset = self.Asset.create({
-            "nombre": "Test Asset",
-            "categoria_id": self.cat.id,
-            "subcategoria_id": self.subcat.id,
-            "ubicacion_id": self.loc.id,
-        })
+        self.asset = self.Asset.create(
+            {
+                "nombre": "Test Asset",
+                "categoria_id": self.cat.id,
+                "subcategoria_id": self.subcat.id,
+                "ubicacion_id": self.loc.id,
+            }
+        )
 
         # Create a maintenance record and mark it as done
-        self.maintenance = self.Maintenance.create({
-            "asset_id": self.asset.id,
-            "state": "done",
-            "fecha_inicio": fields.Date.today(),
-            "fecha_fin": fields.Date.today(),
-        })
+        self.maintenance = self.Maintenance.create(
+            {
+                "asset_id": self.asset.id,
+                "state": "done",
+                "fecha_inicio": fields.Date.today(),
+                "fecha_fin": fields.Date.today(),
+            }
+        )
 
-        self.line = self.MaintenanceLine.create({
-            "maintenance_id": self.maintenance.id,
-            "name": "Task 1",
-            "is_done": True,
-            "notes": "Initial notes",
-        })
+        self.line = self.MaintenanceLine.create(
+            {
+                "maintenance_id": self.maintenance.id,
+                "name": "Task 1",
+                "is_done": True,
+                "notes": "Initial notes",
+            }
+        )
 
     def test_maintenance_line_tracking_implemented(self):
         """Verify that changing notes on a line posts to parent chatter"""
@@ -48,12 +55,8 @@ class TestMaintenanceChatter(common.TransactionCase):
 
         # Verify a new message was posted to the maintenance record
         new_message_count = len(self.maintenance.message_ids)
-        self.assertGreater(
-            new_message_count, 
-            initial_message_count, 
-            "Should have posted a message to the parent chatter"
-        )
-        
+        self.assertGreater(new_message_count, initial_message_count, "Should have posted a message to the parent chatter")
+
         # Verify message content
         last_message = self.maintenance.message_ids[0].body
         self.assertIn("Notas de 'Task 1' cambiadas", last_message)
@@ -69,8 +72,4 @@ class TestMaintenanceChatter(common.TransactionCase):
 
         # Standard tracking usually creates a message
         new_message_count = len(self.maintenance.message_ids)
-        self.assertGreater(
-            new_message_count, 
-            initial_message_count, 
-            "Should have tracked general notes change"
-        )
+        self.assertGreater(new_message_count, initial_message_count, "Should have tracked general notes change")

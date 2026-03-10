@@ -6,10 +6,10 @@ from . import (
     test_employee_history_ui,
     test_id_generation,
     test_import,
+    test_maintenance_chatter,
     test_maintenance_checklists,
     test_maintenance_lifecycle,
     test_qr_relocation,
     test_security_groups,
     test_subcategory_link,
-    test_maintenance_chatter,
 )
