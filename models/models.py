@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, Constraint
 from odoo.exceptions import UserError
 from datetime import timedelta, date
 import qrcode
@@ -171,8 +171,8 @@ class InventoryAsset(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin'] 
     _rec_name = 'nombre'
 
-    _sql_constraints = [
-        ('identificador_final_unique', 'unique(identificador_final)', "⛔ El Identificador Estandarizado debe ser único para cada activo.")
+    _constraints = [
+        Constraint('identificador_final_unique', 'unique(identificador_final)', "⛔ El Identificador Estandarizado debe ser único para cada activo.")
     ]
 
     active = fields.Boolean(string="Activo", default=True, tracking=True)
